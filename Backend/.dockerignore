@@ -1,0 +1,16 @@
+target/
+Dockerfile
+.dockerignore
+.git
+.gitignore
+.idea
+*.iws
+*.iml
+*.ipr
+.settings
+.project
+.classpath
+.factorypath
+# filepath: d:\L-4_T-1\CSE 408\WanderWise\WanderWise\Backend\.dockerignore
+target/
+.git
