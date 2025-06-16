@@ -36,11 +36,7 @@ public class User implements UserDetails {
         return List.of(new SimpleGrantedAuthority("USER"));
     }
     
-    @Override
-    public String getUsername() {
-        // Return email as the username for authentication purposes
-        return this.email;
-    }
+    
 
     @Override
     public boolean isAccountNonExpired() {

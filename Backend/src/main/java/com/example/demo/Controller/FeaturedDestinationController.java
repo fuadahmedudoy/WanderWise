@@ -24,7 +24,6 @@ public class FeaturedDestinationController {
     }
 
     @GetMapping("/featured")
-    @CrossOrigin(origins = {"http://localhost:3000"}, allowCredentials = "false")
     public ResponseEntity<List<FeaturedDestination>> getAllFeaturedDestinations() {
         List<FeaturedDestination> destinations = featuredDestinationService.getAllFeaturedDestinations();
         return ResponseEntity.ok(destinations);
