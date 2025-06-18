@@ -211,7 +211,7 @@ CREATE TABLE public.user_sessions (
 );
 
 CREATE TABLE public.users (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     email character varying(255) NOT NULL,
     username character varying(255) NOT NULL,
     full_name character varying(255),
