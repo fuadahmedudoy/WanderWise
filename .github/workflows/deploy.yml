@@ -1,40 +1,27 @@
-name: Deploy to Azure VM
+- name: Deploy to VM
+  uses: appleboy/ssh-action@master
+  with:
+    host: ${{ secrets.AZURE_VM_HOST }}
+    username: ${{ secrets.AZURE_VM_USERNAME }}
+    key: ${{ secrets.AZURE_VM_SSH_KEY }}
+    script: |
+      # Navigate to the project directory
+      cd wanderwise
 
-on:
-  push:
-    branches:
-      - main 
+      # Pull the latest changes from the main branch
+      git pull origin main
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+      # Write the environment variables from GitHub Secrets to the .env file
+      echo "${{ secrets.ENV_FILE }}" > .env
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      # Stop and remove the old containers
+      docker compose down --remove-orphans
 
-      - name: Deploy to VM
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.AZURE_VM_HOST }}
-          username: ${{ secrets.AZURE_VM_USERNAME }}
-          key: ${{ secrets.AZURE_VM_SSH_KEY }}
-          script: |
-            # Navigate to the project directory
-            cd wanderwise
+      # Rebuild the Docker images without using the cache
+      docker compose build --no-cache
 
-            # Pull the latest changes from the main branch
-            git pull origin main
+      # Start the new services in detached mode
+      docker compose up -d
 
-            # Write the environment variables from GitHub Secrets to the .env file
-            echo "${{ secrets.ENV_FILE }}" > .env
-
-            # Rebuild the Docker images to apply new changes
-            docker-compose build
-
-            # Restart the services.
-            # --remove-orphans cleans up any old containers.
-            docker-compose up -d --remove-orphans
-
-            # Clean up unused Docker images to save space
-            docker image prune -f
+      # Clean up unused Docker images to save space
+      docker image prune -f
