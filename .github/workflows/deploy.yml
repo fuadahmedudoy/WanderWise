@@ -21,7 +21,7 @@ jobs:
           key: ${{ secrets.AZURE_VM_SSH_KEY }}
           script: |
             # Navigate to the project directory
-            cd wanderwise/WanderWise-29a681c34ce1c815b53c392e56599e692649afc8
+            cd wanderwise
 
             # Pull the latest changes from the main branch
             git pull origin main
