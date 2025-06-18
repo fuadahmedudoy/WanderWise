@@ -29,14 +29,14 @@ jobs:
             # Write the environment variables from GitHub Secrets to the .env file
             echo "${{ secrets.ENV_FILE }}" > .env
 
-            # Stop and remove the old containers
-            docker compose down --remove-orphans
+            # Stop and remove old containers and networks
+            docker-compose down --remove-orphans
 
-            # Rebuild the Docker images without using the cache
-            docker compose build --no-cache
+            # Rebuild the Docker images without cache to ensure all changes are included
+            docker-compose build --no-cache
 
-            # Start the new services in detached mode
-            docker compose up -d
+            # Create and start the new containers in detached mode
+            docker-compose up -d
 
             # Clean up unused Docker images to save space
             docker image prune -f
