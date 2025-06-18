@@ -1,27 +1,42 @@
-- name: Deploy to VM
-  uses: appleboy/ssh-action@master
-  with:
-    host: ${{ secrets.AZURE_VM_HOST }}
-    username: ${{ secrets.AZURE_VM_USERNAME }}
-    key: ${{ secrets.AZURE_VM_SSH_KEY }}
-    script: |
-      # Navigate to the project directory
-      cd wanderwise
+name: Deploy to Azure VM
 
-      # Pull the latest changes from the main branch
-      git pull origin main
+on:
+  push:
+    branches:
+      - main 
 
-      # Write the environment variables from GitHub Secrets to the .env file
-      echo "${{ secrets.ENV_FILE }}" > .env
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
 
-      # Stop and remove the old containers
-      docker compose down --remove-orphans
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      # Rebuild the Docker images without using the cache
-      docker compose build --no-cache
+      - name: Deploy to VM
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AZURE_VM_HOST }}
+          username: ${{ secrets.AZURE_VM_USERNAME }}
+          key: ${{ secrets.AZURE_VM_SSH_KEY }}
+          script: |
+            # Navigate to the project directory
+            cd wanderwise
 
-      # Start the new services in detached mode
-      docker compose up -d
+            # Pull the latest changes from the main branch
+            git pull origin main
 
-      # Clean up unused Docker images to save space
-      docker image prune -f
+            # Write the environment variables from GitHub Secrets to the .env file
+            echo "${{ secrets.ENV_FILE }}" > .env
+
+            # Stop and remove the old containers
+            docker compose down --remove-orphans
+
+            # Rebuild the Docker images without using the cache
+            docker compose build --no-cache
+
+            # Start the new services in detached mode
+            docker compose up -d
+
+            # Clean up unused Docker images to save space
+            docker image prune -f
