@@ -21,8 +21,8 @@ import java.util.UUID;
 @Table(name = "users") // Changing table name from "user" to "users" as "user" is a reserved keyword in PostgreSQL
 public class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    // @GeneratedValue(strategy = GenerationType.AUTO)
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
 
 
     private UUID id;
