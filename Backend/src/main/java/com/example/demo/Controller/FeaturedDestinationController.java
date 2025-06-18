@@ -13,7 +13,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/destinations")
-@CrossOrigin(origins = {"http://localhost:3000"}, allowCredentials = "true")
 public class FeaturedDestinationController {
 
     private final FeaturedDestinationService featuredDestinationService;

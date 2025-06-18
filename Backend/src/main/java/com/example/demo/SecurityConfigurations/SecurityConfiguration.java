@@ -21,6 +21,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.example.demo.service.UserDetailService;
 import java.util.Arrays;
+import org.springframework.beans.factory.annotation.Value;
 
 @EnableWebSecurity
 @Configuration
@@ -29,15 +30,18 @@ public class SecurityConfiguration {
     public UserDetailService userDetailService;
     @Autowired
     private GoogleOAuth2SuccessHandler googleOAuth2SuccessHandler;
+    @Value("${frontend.origin:http://localhost:3000}")
+    private String frontendUrl;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); 
+        // corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); 
+        
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
         corsConfiguration.setAllowCredentials(true);
-        
+        corsConfiguration.setAllowedOrigins(Arrays.asList(frontendUrl));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
         return source;

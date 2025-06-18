@@ -8,6 +8,8 @@ import axios from 'axios';
 import { FaStar } from 'react-icons/fa';
 import '../styles/home.css';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+
 const Home = () => {
   const { currentUser, logout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -35,7 +37,7 @@ const Home = () => {
         } : {};
         
         // Make API call to get featured destinations
-        const response = await axios.get('http://localhost:8080/api/destinations/featured', config);
+        const response = await axios.get(`${API_BASE_URL}/destinations/featured`, config);
         
         setFeaturedDestinations(response.data);
         setIsLoading(false);

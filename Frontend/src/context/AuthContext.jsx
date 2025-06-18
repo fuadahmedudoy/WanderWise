@@ -3,7 +3,10 @@ import axios from 'axios';
 
 export const AuthContext = createContext();
 
-const API_BASE_URL = 'http://localhost:8080/api';
+// Use the environment variable provided by Docker Compose. Provide a fallback for local development.
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+// Construct the base URL for OAuth, which doesn't have the /api suffix
+const OAUTH_BASE_URL = API_BASE_URL.replace('/api', '');
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
@@ -68,7 +71,6 @@ export function AuthProvider({ children }) {
   // Sign up/login with Google
   const signupWithGoogle = () => {
     console.log("🚀 Initiating Google OAuth2 login...");
-    console.log("🔗 OAuth2 endpoint: http://localhost:8080/oauth2/authorization/google");
     
     // Before redirecting, store a flag that we're expecting an OAuth return
     localStorage.setItem('awaitingOAuthReturn', 'true');
@@ -76,7 +78,7 @@ export function AuthProvider({ children }) {
     
     // Redirect to Google OAuth
     console.log("➡️ Redirecting to Google OAuth2...");
-    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+    window.location.href = `${OAUTH_BASE_URL}/oauth2/authorization/google`;
   };
 
   // Logout
@@ -96,7 +98,7 @@ export function AuthProvider({ children }) {
   try {
     if (currentToken) {
       // Call backend logout endpoint to blacklist the token
-      await axios.post('http://localhost:8080/api/logout', {}, {
+      await axios.post(`${API_BASE_URL}/logout`, {}, {
         headers: {
           'Authorization': `Bearer ${currentToken}`
         }

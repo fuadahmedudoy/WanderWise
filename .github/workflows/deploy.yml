@@ -1,0 +1,40 @@
+name: Deploy to Azure VM
+
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy to VM
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AZURE_VM_HOST }}
+          username: ${{ secrets.AZURE_VM_USERNAME }}
+          key: ${{ secrets.AZURE_VM_SSH_KEY }}
+          script: |
+            # Navigate to the project directory
+            cd wanderwise/WanderWise-29a681c34ce1c815b53c392e56599e692649afc8
+
+            # Pull the latest changes from the main branch
+            git pull origin main
+
+            # Write the environment variables from GitHub Secrets to the .env file
+            echo "${{ secrets.ENV_FILE }}" > .env
+
+            # Rebuild the Docker images to apply new changes
+            docker-compose build
+
+            # Restart the services.
+            # --remove-orphans cleans up any old containers.
+            docker-compose up -d --remove-orphans
+
+            # Clean up unused Docker images to save space
+            docker image prune -f
