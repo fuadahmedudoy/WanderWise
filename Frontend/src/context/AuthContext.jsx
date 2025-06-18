@@ -4,9 +4,9 @@ import axios from 'axios';
 export const AuthContext = createContext();
 
 // Use the environment variable provided by Docker Compose. Provide a fallback for local development.
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+//const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 // Construct the base URL for OAuth, which doesn't have the /api suffix
-const OAUTH_BASE_URL = API_BASE_URL.replace('/api', '');
+//const OAUTH_BASE_URL = API_BASE_URL.replace('/api', '');
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
@@ -30,7 +30,13 @@ export function AuthProvider({ children }) {
   const signup = async (email, password, userData) => {
     try {
       // Match exactly the backend RegisterRequest format
-      const response = await axios.post(`${API_BASE_URL}/signup`, {
+      // const response = await axios.post(`${API_BASE_URL}/signup`, {
+      //   email,
+      //   password,
+      //   username: userData.username
+      //   // No fullName or address fields in backend RegisterRequest
+      // });
+      const response = await axios.post('/api/signup', {
         email,
         password,
         username: userData.username
@@ -45,9 +51,15 @@ export function AuthProvider({ children }) {
   };
 
   // Login with email and password
+  // const login = async (email, password) => {
+  //   try {
+  //     const response = await axios.post(`${API_BASE_URL}/login`, {
+  //       email,
+  //       password
+  //     });
   const login = async (email, password) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/login`, {
+      const response = await axios.post('/api/login', {
         email,
         password
       });
@@ -71,6 +83,10 @@ export function AuthProvider({ children }) {
   // Sign up/login with Google
   const signupWithGoogle = () => {
     console.log("🚀 Initiating Google OAuth2 login...");
+
+    const googleLoginUrl = process.env.NODE_ENV === 'development'
+      ? 'http://localhost:8080/oauth2/authorization/google'
+      : '/oauth2/authorization/google';
     
     // Before redirecting, store a flag that we're expecting an OAuth return
     localStorage.setItem('awaitingOAuthReturn', 'true');
@@ -78,7 +94,8 @@ export function AuthProvider({ children }) {
     
     // Redirect to Google OAuth
     console.log("➡️ Redirecting to Google OAuth2...");
-    window.location.href = `${OAUTH_BASE_URL}/oauth2/authorization/google`;
+    // window.location.href = `${OAUTH_BASE_URL}/oauth2/authorization/google`;
+    window.location.href = googleLoginUrl;
   };
 
   // Logout
@@ -98,7 +115,12 @@ export function AuthProvider({ children }) {
   try {
     if (currentToken) {
       // Call backend logout endpoint to blacklist the token
-      await axios.post(`${API_BASE_URL}/logout`, {}, {
+      // await axios.post(`${API_BASE_URL}/logout`, {}, {
+      //   headers: {
+      //     'Authorization': `Bearer ${currentToken}`
+      //   }
+      // });
+      await axios.post('/api/logout', {}, {
         headers: {
           'Authorization': `Bearer ${currentToken}`
         }
@@ -132,7 +154,7 @@ export function AuthProvider({ children }) {
           
           // Get current user info
           console.log("AuthContext: Fetching user info from API");
-          const response = await axios.get(`${API_BASE_URL}/me`);
+          const response = await axios.get('/api/me');
           console.log("AuthContext: User data received:", response.data);
           
           setCurrentUser(response.data);
