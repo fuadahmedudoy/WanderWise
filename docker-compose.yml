@@ -32,7 +32,8 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      frontend.origin: ${FRONTEND_URL}
+      # frontend.origin: ${FRONTEND_URL}
+      frontend.origin: http://frontend
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/wanderwise
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
@@ -55,8 +56,8 @@ services:
       - "3000:80"
     networks:
       - wanderwise-network
-    environment:
-      - REACT_APP_API_URL=${REACT_APP_API_URL}
+    # environment:
+    #   - REACT_APP_API_URL=${REACT_APP_API_URL}
 
 
 networks:

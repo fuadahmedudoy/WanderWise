@@ -99,7 +99,7 @@ const Home = () => {
           <h1>Welcome to WanderWise!</h1>
         )}
         <p>Discover amazing destinations and plan your perfect trip.</p>
-        <p>Checking ci/cd 2</p>
+        <p>Checking ci/cd </p>
         <div className="action-buttons">
           <button className="btn-primary" onClick={navigateToCreateTrip}>Create New Trip</button>
           <button className="btn-secondary" onClick={navigateToMyTrips}>View My Trips</button>

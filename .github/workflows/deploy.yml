@@ -27,7 +27,7 @@ jobs:
             git pull origin main
 
             # Write the environment variables from GitHub Secrets to the .env file
-            echo "${{ secrets.ENV_FILE }}" > .env
+            #echo "${{ secrets.ENV_FILE }}" > .env
 
             # Stop and remove old containers and networks
             docker-compose down --remove-orphans
