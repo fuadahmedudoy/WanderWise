@@ -32,6 +32,8 @@ public class SecurityConfiguration {
     private GoogleOAuth2SuccessHandler googleOAuth2SuccessHandler;
     @Value("${frontend.origin:http://localhost:3000}")
     private String frontendUrl;
+    @Value("${http://wanderwise.publicvm.com:3000}")
+    private String frontendDomainUrl;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
@@ -41,7 +43,7 @@ public class SecurityConfiguration {
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
         corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setAllowedOrigins(Arrays.asList(frontendUrl));
+        corsConfiguration.setAllowedOrigins(Arrays.asList(frontendUrl,backendDomainUrl));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
         return source;
@@ -68,7 +70,7 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement((sm-> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)))                .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/login", "/api/register", "/api/signup", "/api/ping", 
-                                    "/login/oauth2/code/**", "/oauth2/**", "/oauth2/authorization/**","/api/destinations/featured","http://wanderwise.publicvm.com:3000").permitAll()
+                                    "/login/oauth2/code/**", "/oauth2/**", "/oauth2/authorization/**","/api/destinations/featured").permitAll()
                     .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                     .loginPage("/api/login")
