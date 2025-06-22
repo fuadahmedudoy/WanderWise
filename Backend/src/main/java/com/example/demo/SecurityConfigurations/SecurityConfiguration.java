@@ -68,7 +68,7 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement((sm-> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)))                .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/login", "/api/register", "/api/signup", "/api/ping", 
-                                    "/login/oauth2/code/**", "/oauth2/**", "/oauth2/authorization/**","/api/destinations/featured").permitAll()
+                                    "/login/oauth2/code/**", "/oauth2/**", "/oauth2/authorization/**","/api/destinations/featured","http://wanderwise.publicvm.com:3000").permitAll()
                     .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                     .loginPage("/api/login")
