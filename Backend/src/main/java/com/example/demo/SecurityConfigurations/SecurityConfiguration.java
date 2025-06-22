@@ -32,8 +32,8 @@ public class SecurityConfiguration {
     private GoogleOAuth2SuccessHandler googleOAuth2SuccessHandler;
     @Value("${frontend.origin:http://localhost:3000}")
     private String frontendUrl;
-    @Value("${http://wanderwise.publicvm.com:3000}")
-    private String frontendDomainUrl;
+    //@Value("${http://wanderwise.publicvm.com:3000}")
+    private String frontendDomainUrl="http://wanderwise.publicvm.com:3000";
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
