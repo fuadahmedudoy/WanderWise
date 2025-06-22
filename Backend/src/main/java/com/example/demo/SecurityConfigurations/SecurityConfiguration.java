@@ -32,8 +32,8 @@ public class SecurityConfiguration {
     private GoogleOAuth2SuccessHandler googleOAuth2SuccessHandler;
     @Value("${frontend.origin:http://localhost:3000}")
     private String frontendUrl;
-    @Value("${http://wanderwise.publicvm.com:8080}")
-    private String backendDomainUrl;
+    //@Value("${http://wanderwise.publicvm.com:8080}")
+    private String frontendDomainUrl="http://wanderwise.publicvm.com:3000";
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
@@ -43,7 +43,7 @@ public class SecurityConfiguration {
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
         corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setAllowedOrigins(Arrays.asList(frontendUrl,backendDomainUrl));
+        corsConfiguration.setAllowedOrigins(Arrays.asList(frontendUrl));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
         return source;
