@@ -8,6 +8,7 @@ import OAuthSuccess from './pages/auth/OAuthSuccess';
 import Home from './pages/Home';
 import CreateTrip from './pages/CreateTrip';
 import MyTrips from './pages/MyTrips';
+import DestinationDetail from './pages/DestinationDetail';
 import './styles/global.css';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
           <Route path="/auth/signup" element={<Signup />} />
           <Route path="/oauth-success" element={<OAuthSuccess />} />
           <Route path="/" element={<Home />} />
+          <Route path="/destination/:id" element={<DestinationDetail />} />
           <Route 
             path="/create-trip" 
             element={

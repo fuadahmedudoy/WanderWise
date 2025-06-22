@@ -54,7 +54,7 @@ const MyTrips = () => {
   return (
     <div className="page-container">
       <header className="page-header">
-        <div className="logo">Trip Planner</div>
+        <div className="logo">WanderWise</div>
         <button onClick={() => navigate('/')} className="btn-outline">Back to Home</button>
       </header>
       

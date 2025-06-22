@@ -28,11 +28,11 @@ public class FeaturedDestinationController {
         return ResponseEntity.ok(destinations);
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<FeaturedDestination> getFeaturedDestinationById(@PathVariable UUID id) {
-//        FeaturedDestination destination = featuredDestinationService.getFeaturedDestinationById(id);
-//        return ResponseEntity.ok(destination);
-//    }
+   @GetMapping("/{id}")
+   public ResponseEntity<FeaturedDestination> getFeaturedDestinationById(@PathVariable UUID id) {
+       FeaturedDestination destination = featuredDestinationService.getFeaturedDestinationById(id);
+       return ResponseEntity.ok(destination);
+   }
 //
 //    @PostMapping("/featured")
 //    public ResponseEntity<FeaturedDestination> createFeaturedDestination(@RequestBody FeaturedDestinationDTO dto) {

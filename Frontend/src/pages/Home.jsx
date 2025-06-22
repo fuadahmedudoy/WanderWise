@@ -1,14 +1,9 @@
-
-
-
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import axios from 'axios';
 import { FaStar } from 'react-icons/fa';
 import '../styles/home.css';
-
-//const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 
 const Home = () => {
   const { currentUser, logout } = useContext(AuthContext);
@@ -36,8 +31,6 @@ const Home = () => {
           headers: { Authorization: `Bearer ${token}` }
         } : {};
         
-        // Make API call to get featured destinations
-        // const response = await axios.get(`${API_BASE_URL}/destinations/featured`, config);
         const response = await axios.get('/api/destinations/featured', config);
         
         setFeaturedDestinations(response.data);
@@ -99,7 +92,6 @@ const Home = () => {
           <h1>Welcome to WanderWise!</h1>
         )}
         <p>Discover amazing destinations and plan your perfect trip.</p>
-        <p>Checking CI/CD </p>
         <div className="action-buttons">
           <button className="btn-primary" onClick={navigateToCreateTrip}>Create New Trip</button>
           <button className="btn-secondary" onClick={navigateToMyTrips}>View My Trips</button>
@@ -126,7 +118,8 @@ const Home = () => {
           <div className="destination-cards">
             {featuredDestinations.length > 0 ? (
               featuredDestinations.map(destination => (
-                <div className="destination-card" key={destination.id} onClick={() => navigateToDestination(destination.id)}>
+                <div className="destination-card" key={destination.id}>
+                  {/* The onClick handler has been removed from the div above */}
                   <div 
                     className="card-image" 
                     style={{ backgroundImage: `url(${destination.imageUrl})` }}
@@ -142,7 +135,13 @@ const Home = () => {
                       </div>
                     </div>
                     <p className="destination-description">{destination.description.substring(0, 100)}...</p>
-                    <button className="btn-outline view-details">View Details</button>
+                    {/* The onClick handler is now on the button below */}
+                    <button 
+                      className="btn-outline view-details" 
+                      onClick={() => navigateToDestination(destination.id)}
+                    >
+                      View Details
+                    </button>
                   </div>
                 </div>
               ))

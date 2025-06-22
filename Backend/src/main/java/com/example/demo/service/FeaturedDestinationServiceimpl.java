@@ -2,7 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dto.FeaturedDestinationDTO;
 import com.example.demo.entity.FeaturedDestination;
-//import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.Repository.FeaturedDestinationRepository;
 import com.example.demo.service.FeaturedDestinationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +27,11 @@ class FeaturedDestinationServiceImpl implements FeaturedDestinationService {
         return featuredDestinationRepository.findByIsActiveTrue();
     }
 
-//    @Override
-//    public FeaturedDestination getFeaturedDestinationById(UUID id) {
-//        return featuredDestinationRepository.findById(id);
-//                //.orElseThrow(() -> new ResourceNotFoundException("Featured destination not found with id: " + id));
-//    }
+   @Override
+   public FeaturedDestination getFeaturedDestinationById(UUID id) {
+       return featuredDestinationRepository.findById(id)
+               .orElseThrow(() -> new ResourceNotFoundException("Featured destination not found with id: " + id));
+   }
 
 //    @Override
 //    @Transactional

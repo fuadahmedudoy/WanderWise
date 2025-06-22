@@ -32,8 +32,8 @@ public class SecurityConfiguration {
     private GoogleOAuth2SuccessHandler googleOAuth2SuccessHandler;
     @Value("${frontend.origin:http://localhost:3000}")
     private String frontendUrl;
-    @Value("${http://wanderwise.publicvm.com:3000}")
-    private String frontendDomainUrl;
+    @Value("${http://wanderwise.publicvm.com:8080}")
+    private String backendDomainUrl;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){
@@ -70,7 +70,7 @@ public class SecurityConfiguration {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement((sm-> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)))                .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/login", "/api/register", "/api/signup", "/api/ping", 
-                                    "/login/oauth2/code/**", "/oauth2/**", "/oauth2/authorization/**","/api/destinations/featured").permitAll()
+                                    "/login/oauth2/code/**", "/oauth2/**", "/oauth2/authorization/**","/api/destinations/featured","/api/destinations/**").permitAll()
                     .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                     .loginPage("/api/login")
