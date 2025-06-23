@@ -84,7 +84,7 @@ public class SecurityConfiguration {
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/api/login")
                         .successHandler(googleOAuth2SuccessHandler)
-                        .failureUrl("/api/login?error=true"))
+                        .failureUrl("/api/ping"))
                 .authenticationProvider(authenticationProvider) // Use the injected provider
                 .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
