@@ -33,6 +33,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
+          distribution: 'temurin' # Specify the Java distribution
 
       # Step 4: Run backend tests
       - name: Run backend tests
