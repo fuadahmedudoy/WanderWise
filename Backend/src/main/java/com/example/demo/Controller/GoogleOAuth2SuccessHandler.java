@@ -18,7 +18,7 @@ import java.io.IOException;
 @Component
 public class GoogleOAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
-    @Value("${frontend.origin:http://localhost:3000}")
+    @Value("${FRONTEND_URL:http://localhost:3000}")
     private String FRONT_END_ORIGIN;
 
     @Autowired
