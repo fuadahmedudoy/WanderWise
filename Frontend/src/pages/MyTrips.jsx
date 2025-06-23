@@ -1,42 +1,44 @@
-import React, { useContext, useState } from 'react';
+// Frontend/src/pages/MyTrips.jsx
+import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
+import api from '../api'; // <-- Import api
 import '../styles/trips.css';
 
 const MyTrips = () => {
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [showAuthDialog, setShowAuthDialog] = useState(!currentUser);
+  const [trips, setTrips] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   
-  // Mock trip data
-  const mockTrips = [
-    {
-      id: 1,
-      name: 'Weekend in Coxs Bazar',
-      destination: 'Coxs Bazar, Bangladesh',
-      startDate: '2025-06-10',
-      endDate: '2025-06-12',
-      status: 'upcoming'
-    },
-    {
-      id: 2,
-      name: 'Sajek Valley Exploration',
-      destination: 'Sajek Valley, Bangladesh',
-      startDate: '2025-07-15',
-      endDate: '2025-07-18',
-      status: 'planned'
-    }
-  ];
-  
+  useEffect(() => {
+    const fetchTrips = async () => {
+      if (currentUser) {
+        try {
+          const response = await api.get('/api/trips');
+          setTrips(response.data);
+        } catch (error) {
+          console.error("Failed to fetch trips", error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setIsLoading(false);
+      }
+    };
+    fetchTrips();
+  }, [currentUser]);
+
+  // ... (rest of the component is the same)
   const handleCreateTrip = () => {
     navigate('/create-trip');
   };
   
   const handleLogin = () => {
-    navigate('/login');
+    navigate('/auth/login');
   };
 
-  if (showAuthDialog) {
+  if (!currentUser) {
     return (
       <div className="auth-dialog-overlay">
         <div className="auth-dialog">
@@ -64,9 +66,11 @@ const MyTrips = () => {
           <button onClick={handleCreateTrip} className="btn-primary">Create New Trip</button>
         </div>
         
-        {mockTrips.length > 0 ? (
+        {isLoading ? (
+          <p>Loading trips...</p>
+        ) : trips.length > 0 ? (
           <div className="trips-list">
-            {mockTrips.map(trip => (
+            {trips.map(trip => (
               <div key={trip.id} className="trip-card">
                 <div className="trip-info">
                   <h3>{trip.name}</h3>

@@ -1,7 +1,8 @@
+// Frontend/src/pages/Home.jsx
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
-import axios from 'axios';
+import api from '../api'; // <-- Import api
 import { FaStar } from 'react-icons/fa';
 import '../styles/home.css';
 
@@ -12,27 +13,15 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // Use localStorage as a fallback if currentUser is null
-  const userFromStorage = !currentUser && localStorage.getItem('currentUser') 
-    ? JSON.parse(localStorage.getItem('currentUser')) 
-    : null;
-  
-  const effectiveUser = currentUser || userFromStorage;
+  const effectiveUser = currentUser || (localStorage.getItem('currentUser') ? JSON.parse(localStorage.getItem('currentUser')) : null);
 
-  // Fetch featured destinations from the backend
   useEffect(() => {
     const fetchFeaturedDestinations = async () => {
       try {
         setIsLoading(true);
         setError(null);
-        
-        const token = localStorage.getItem('token');
-        const config = token ? { 
-          headers: { Authorization: `Bearer ${token}` }
-        } : {};
-        
-        const response = await axios.get('/api/destinations/featured', config);
-        
+        // Use the new api instance
+        const response = await api.get('/api/destinations/featured');
         setFeaturedDestinations(response.data);
         setIsLoading(false);
       } catch (err) {
@@ -45,7 +34,8 @@ const Home = () => {
     fetchFeaturedDestinations();
   }, []);
 
-  const handleLogout = async () => {
+  // ... (rest of the component is the same)
+    const handleLogout = async () => {
     try {
       await logout();
       navigate('/auth/login');
@@ -75,7 +65,8 @@ const Home = () => {
       <nav className="navbar">
         <div className="logo">WanderWise</div>
         {effectiveUser ? (
-          <div className="nav-buttons">
+          <div className="action-buttons">
+            <button onClick={() => navigate('/profile')} className="btn-outline">Profile</button>
             <button onClick={handleLogout} className="btn-outline">Logout</button>
           </div>
         ) : (

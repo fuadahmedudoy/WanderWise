@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import AuthContext from '../../context/AuthContext';
-import axios from 'axios';
+//import axios from 'axios';
 import '../../styles/auth.css';
 
 const OAuthSuccess = () => {
@@ -73,9 +73,9 @@ const OAuthSuccess = () => {
           localStorage.setItem('currentUser', JSON.stringify(userData));
           console.log("💾 Data saved to localStorage");
           
-          // 2. Set axios authorization header
-          axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
-          console.log("🔗 Authorization header set for future requests");
+          // // 2. Set axios authorization header
+          // axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
+          // console.log("🔗 Authorization header set for future requests");
           
           // 3. Set token and user in context
           console.log("🔄 Setting token and user in AuthContext...");

@@ -8,6 +8,7 @@ import OAuthSuccess from './pages/auth/OAuthSuccess';
 import Home from './pages/Home';
 import CreateTrip from './pages/CreateTrip';
 import MyTrips from './pages/MyTrips';
+import Profile from './pages/Profile'; 
 import DestinationDetail from './pages/DestinationDetail';
 import './styles/global.css';
 
@@ -34,6 +35,15 @@ function App() {
             element={
               <RequireAuth>
                 <MyTrips />
+              </RequireAuth>
+            } 
+          />
+          
+          <Route 
+            path="/profile" 
+            element={
+              <RequireAuth>
+                <Profile />
               </RequireAuth>
             } 
           />

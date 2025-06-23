@@ -191,8 +191,8 @@ CREATE TABLE public.user_profiles (
     user_id uuid NOT NULL,
     bio text,
     profile_picture_url text,
-    current_trip_plan_id uuid,
-    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    first_name character varying(255),
+    last_name character varying(255),
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -214,7 +214,6 @@ CREATE TABLE public.users (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     email character varying(255) NOT NULL,
     username character varying(255) NOT NULL,
-    full_name character varying(255),
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     password character varying(255),
     role character varying(255)
@@ -268,7 +267,7 @@ COPY public.trip_todolist (id, trip_plan_id, place_name, is_visited, date_added,
 COPY public.user_completed_trips (id, user_id, trip_plan_id, completion_date, rating, feedback, created_at) FROM stdin;
 \.
 
-COPY public.user_profiles (user_id, bio, profile_picture_url, current_trip_plan_id, created_at, updated_at) FROM stdin;
+COPY public.user_profiles (user_id, bio, profile_picture_url, first_name, second_name, updated_at) FROM stdin;
 \.
 
 COPY public.user_roles (user_id, role) FROM stdin;
@@ -277,11 +276,11 @@ COPY public.user_roles (user_id, role) FROM stdin;
 COPY public.user_sessions (id, user_id, refresh_token, expires_at, created_at) FROM stdin;
 \.
 
-COPY public.users (id, email, username, full_name, created_at, password, role) FROM stdin;
-f2b40568-78ea-48df-a442-e463cbcb8851	rks@gmail.com	rks	\N	2025-05-25 20:56:05.275056+06	$2a$10$yo0N2U78ng.RAm3iA5xzP.gxfb.XowF2YcNeJ59OGB25/DIISSnIS	USER
-9054c01f-cc86-425a-8222-4d951872631e	rakeshdebnath12910@gmail.com	Rakesh Debnath	\N	2025-05-25 20:57:52.224949+06		USER
-7e4ef6b9-7a8d-4ef9-9d81-2c9dbaec2f99	abc@gmail.com	' OR 1=1 -- 	\N	2025-05-25 23:21:17.998663+06	$2a$10$pPLQj0z9ZK4bDNidEgo6P.FFwTWGicakXnzT/hwfwOiDkXCP9nQsW	USER
-e1f6df6c-df51-40fd-9bb1-269db8fa1588	rifti@gmail.com	rifti	\N	2025-05-26 14:02:34.290185+06	$2a$10$TylZZKDMB0QAtgRkRHsifedgfPI18P8uq4wuUq97/F1pDSP2MRzNe	USER
+COPY public.users (id, email, username, created_at, password, role) FROM stdin;
+f2b40568-78ea-48df-a442-e463cbcb8851	rks@gmail.com	rks	2025-05-25 20:56:05.275056+06	$2a$10$yo0N2U78ng.RAm3iA5xzP.gxfb.XowF2YcNeJ59OGB25/DIISSnIS	USER
+9054c01f-cc86-425a-8222-4d951872631e	rakeshdebnath12910@gmail.com	Rakesh Debnath	2025-05-25 20:57:52.224949+06		USER
+7e4ef6b9-7a8d-4ef9-9d81-2c9dbaec2f99	abc@gmail.com	' OR 1=1 -- 	2025-05-25 23:21:17.998663+06	$2a$10$pPLQj0z9ZK4bDNidEgo6P.FFwTWGicakXnzT/hwfwOiDkXCP9nQsW	USER
+e1f6df6c-df51-40fd-9bb1-269db8fa1588	rifti@gmail.com	rifti	2025-05-26 14:02:34.290185+06	$2a$10$TylZZKDMB0QAtgRkRHsifedgfPI18P8uq4wuUq97/F1pDSP2MRzNe	USER
 \.
 
 ALTER TABLE ONLY public."FeaturedDestination_reviews"
@@ -412,9 +411,6 @@ ALTER TABLE ONLY public.user_completed_trips
 
 ALTER TABLE ONLY public.user_completed_trips
     ADD CONSTRAINT user_completed_trips_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
-
-ALTER TABLE ONLY public.user_profiles
-    ADD CONSTRAINT user_profiles_current_trip_plan_id_fkey FOREIGN KEY (current_trip_plan_id) REFERENCES public.trip_plans(id) ON DELETE SET NULL;
 
 ALTER TABLE ONLY public.user_profiles
     ADD CONSTRAINT user_profiles_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;

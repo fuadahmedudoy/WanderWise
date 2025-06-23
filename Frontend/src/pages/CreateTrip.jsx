@@ -1,6 +1,8 @@
+// Frontend/src/pages/CreateTrip.jsx
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
+import api from '../api'; // <-- Import api
 import '../styles/trips.css';
 
 const CreateTrip = () => {
@@ -15,15 +17,28 @@ const CreateTrip = () => {
   const [endDate, setEndDate] = useState('');
   const [description, setDescription] = useState('');
   
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would save the trip data
-    alert('Trip created successfully!');
-    navigate('/my-trips');
+    try {
+      // Use the new api instance to create the trip
+      await api.post('/api/trips', {
+        tripName,
+        destination,
+        startDate,
+        endDate,
+        description,
+      });
+      alert('Trip created successfully!');
+      navigate('/my-trips');
+    } catch (error) {
+      console.error("Failed to create trip", error);
+      alert('Failed to create trip. Please try again.');
+    }
   };
   
+  // ... (rest of the component is the same)
   const handleLogin = () => {
-    navigate('/login');
+    navigate('/auth/login');
   };
 
   if (showAuthDialog) {
@@ -117,5 +132,4 @@ const CreateTrip = () => {
     </div>
   );
 };
-
 export default CreateTrip;

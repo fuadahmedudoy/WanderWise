@@ -1,9 +1,9 @@
-name: Deploy to Azure VM
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
-      - main 
+      - main
 
 jobs:
   deploy:
@@ -12,6 +12,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Run simple validation test
+        run: |
+          echo "Running simple validation..."
+          if [ ! -f "Backend/pom.xml" ]; then
+            echo "Backend/pom.xml not found!"
+            exit 1
+          fi
+          if [ ! -f "Frontend/package.json" ]; then
+            echo "Frontend/package.json not found!"
+            exit 1
+          fi
+          echo "Validation successful!"
 
       - name: Deploy to VM
         uses: appleboy/ssh-action@master

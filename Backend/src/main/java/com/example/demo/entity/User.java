@@ -13,18 +13,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Data
 @Entity
-@Table(name = "users") // Changing table name from "user" to "users" as "user" is a reserved keyword in PostgreSQL
+@Table(name = "users")
 public class User implements UserDetails {
     @Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @GeneratedValue(strategy = GenerationType.AUTO)
-
-
     private UUID id;
 
     @Column(nullable = false, unique = true)
@@ -32,12 +30,15 @@ public class User implements UserDetails {
     private String password;
     private String username;
     private String role;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private UserProfile userProfile;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("USER"));
     }
-    
-    
 
     @Override
     public boolean isAccountNonExpired() {

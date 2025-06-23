@@ -1,6 +1,7 @@
+// Frontend/src/pages/DestinationDetail.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api'; // <-- Import api
 import { FaStar, FaMapMarkerAlt, FaRegClock } from 'react-icons/fa';
 import '../styles/DestinationDetail.css';
 
@@ -16,7 +17,8 @@ const DestinationDetail = () => {
       try {
         setIsLoading(true);
         setError(null);
-        const response = await axios.get(`/api/destinations/${id}`);
+        // Use the new api instance
+        const response = await api.get(`/api/destinations/${id}`);
         setDestination(response.data);
         setIsLoading(false);
       } catch (err) {
@@ -28,7 +30,8 @@ const DestinationDetail = () => {
 
     fetchDestination();
   }, [id]);
-
+  
+  // ... (rest of the component is the same)
   if (isLoading) {
     return <div className="loading-container">Loading...</div>;
   }
