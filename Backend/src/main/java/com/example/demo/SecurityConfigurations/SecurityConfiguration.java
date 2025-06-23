@@ -82,7 +82,7 @@ public class SecurityConfiguration {
                                 "/api/destinations/featured", "/api/destinations/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/api/login")
+                        //.loginPage("/api/login")
                         .successHandler(googleOAuth2SuccessHandler)
                         .failureUrl("/api/login?error=true"))
                 .authenticationProvider(authenticationProvider) // Use the injected provider
