@@ -8,6 +8,10 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   
+  const setToken = useCallback((token) => {
+    localStorage.setItem('token', token);
+  }, []);
+
   const login = useCallback(async (email, password) => {
     try {
       const response = await api.post('/api/login', { email, password });
@@ -81,7 +85,7 @@ export function AuthProvider({ children }) {
     checkAuth();
   }, [logout]);
 
-  const value = { currentUser, login, signup, logout, signupWithGoogle, setCurrentUser };
+  const value = { currentUser, login, signup, logout, signupWithGoogle, setToken, setCurrentUser };
 
   return (
     <AuthContext.Provider value={value}>
