@@ -3,40 +3,61 @@ package com.example.demo.service;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.entity.User;
-
+import com.example.demo.entity.UserProfile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
     @Autowired
     private UserRepository userRepository;
-    
+
     @Autowired
     private PasswordEncoder passwordEncoder;
-      public User register(RegisterRequest request) {
-        // Check if user with this email already exists
-        User existingUserEmail = userRepository.findByEmail(request.getEmail());
-        if (existingUserEmail != null) {
-            throw new RuntimeException("Email already exists. Please use a different email address or try to log in if you already have an account.");
+
+    @Transactional
+    public User registerNewUserAccount(RegisterRequest registerRequest) {
+        if (userRepository.findByUsername(registerRequest.getUsername()) != null) {
+            throw new RuntimeException("Error: Username is already taken!");
         }
-        
-        // Check if username is taken
-        User existingUsername = userRepository.findByUsername(request.getUsername());
-        if (existingUsername != null) {
-            throw new RuntimeException("Username already taken. Please choose a different username.");
+
+        if (userRepository.findByEmail(registerRequest.getEmail()) != null) {
+            throw new RuntimeException("Error: Email is already in use!");
         }
-        
-        // Create new user
-        User user = User.builder()
-                .email(request.getEmail())
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role("USER")
-                .build();
-                
-        // Save user to database
+
+        User user = new User();
+        user.setUsername(registerRequest.getUsername());
+        user.setEmail(registerRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        user.setRole("USER");
+
+        // Create and link the profile before saving
+        UserProfile userProfile = new UserProfile();
+        userProfile.setUser(user);
+        user.setUserProfile(userProfile);
+
         return userRepository.save(user);
+    }
+
+    @Transactional
+    public User registerNewOAuth2User(String name, String email) {
+        User user = new User();
+        user.setUsername(name);
+        user.setEmail(email);
+        user.setRole("USER");
+        user.setPassword(""); // No password for OAuth users
+
+        // Create and link the profile before saving
+        UserProfile userProfile = new UserProfile();
+        userProfile.setUser(user);
+        user.setUserProfile(userProfile);
+        
+        return userRepository.save(user);
+    }
+    
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }

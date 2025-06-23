@@ -1,8 +1,8 @@
 package com.example.demo.Controller;
 
-import com.example.demo.Repository.UserRepository;
 import com.example.demo.SecurityConfigurations.JwtUtility;
 import com.example.demo.entity.User;
+import com.example.demo.service.UserService; // Import UserService
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,10 +22,11 @@ public class GoogleOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     private String FRONT_END_ORIGIN;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService; // Use UserService
 
     @Autowired
     private JwtUtility jwtUtility;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
@@ -39,17 +40,14 @@ public class GoogleOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         
         System.out.println("Email: " + email + ", Name: " + name);
 
-        // Create user if doesn't exist
-        User user = userRepository.findByEmail(email);
+        // Find user by email or create a new one using the consistent service method
+        User user = userService.findByEmail(email);
         if (user == null) {
-            user = User.builder()
-                    .email(email)
-                    .username(name)
-                    .role("USER")
-                    .password("") // OAuth2 users don't need a password
-                    .build();
-            userRepository.save(user);
-        }        // Generate JWT
+            System.out.println("User not found, creating new OAuth2 user...");
+            user = userService.registerNewOAuth2User(name, email);
+        }
+        
+        // Generate JWT
         String jwt = jwtUtility.generateToken(user);
         System.out.println("JWT Token generated for user: " + user.getEmail());
 

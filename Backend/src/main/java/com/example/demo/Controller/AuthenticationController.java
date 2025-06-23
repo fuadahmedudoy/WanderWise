@@ -6,7 +6,7 @@ import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.entity.User;
 import com.example.demo.service.TokenBlacklistService;
-import com.example.demo.service.UserProfileService; 
+import com.example.demo.service.UserProfileService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -45,8 +45,9 @@ public class AuthenticationController {
     @Autowired
     private TokenBlacklistService tokenBlacklistService;
 
-    @Autowired
-    private UserProfileService userProfileService; 
+    // This is no longer needed for registration
+    // @Autowired
+    // private UserProfileService userProfileService; 
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
@@ -57,6 +58,7 @@ public class AuthenticationController {
         }
         return ResponseEntity.badRequest().body(Map.of("message", "Invalid token"));
     }
+    
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
         try {
@@ -84,11 +86,12 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
     }
-      @PostMapping("/signup")
+    
+    @PostMapping("/signup")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
         try {
-            User user = userService.register(registerRequest);
-            userProfileService.createProfileForNewUser(user); // Create a profile for the new user
+            // The service now handles both User and UserProfile creation
+            User user = userService.registerNewUserAccount(registerRequest);
             
             Map<String, Object> response = new HashMap<>();
             response.put("message", "User registered successfully");
@@ -102,6 +105,7 @@ public class AuthenticationController {
         }
     }
     
+    // ... (the rest of the controller remains the same)
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
