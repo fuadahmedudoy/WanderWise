@@ -10,9 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Step 2: Run simple validation test
       - name: Run simple validation test
         run: |
           echo "Running simple validation..."
@@ -26,6 +28,18 @@ jobs:
           fi
           echo "Validation successful!"
 
+      # Step 3: Set up Java for running tests
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+
+      # Step 4: Run backend tests
+      - name: Run backend tests
+        working-directory: Backend
+        run: mvn test
+
+      # Step 5: Deploy to VM (only if tests pass)
       - name: Deploy to VM
         uses: appleboy/ssh-action@master
         with:
