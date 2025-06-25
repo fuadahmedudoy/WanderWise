@@ -19,7 +19,7 @@ import java.io.IOException;
 public class GoogleOAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     // @Value("${FRONTEND_URL:http://localhost:3000}")
-    private String FRONT_END_ORIGIN="http://http://135.235.137.124:3000";
+    private String FRONT_END_ORIGIN="http://135.235.137.124:3000";
 
     @Autowired
     private UserService userService; // Use UserService
