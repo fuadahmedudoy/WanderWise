@@ -1,0 +1,1631 @@
+/* Travel Planner Styles */
+.travel-planner {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.planner-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.planner-header {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    padding: 40px;
+    text-align: center;
+    color: white;
+}
+
+.planner-header h1 {
+    font-size: 2.5rem;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.planner-header p {
+    font-size: 1.2rem;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.planner-form {
+    padding: 40px;
+    background: white;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #2d3748;
+    font-size: 1rem;
+}
+
+.form-group input,
+.form-group select {
+    padding: 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f7fafc;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #4facfe;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+    transform: translateY(-1px);
+}
+
+.plan-button {
+    width: 100%;
+    padding: 18px 32px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.plan-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.plan-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-message {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    color: white;
+    padding: 16px;
+    border-radius: 12px;
+    margin: 20px 40px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.trip-results {
+    background: #f8fafc;
+    padding: 40px;
+}
+
+.results-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.results-header h2 {
+    font-size: 2rem;
+    color: #2d3748;
+    margin: 0 0 16px 0;
+    font-weight: 700;
+}
+
+.trip-summary {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.trip-summary span {
+    background: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    color: #4a5568;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.results-grid {
+    display: grid;
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.result-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.result-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.result-card h3 {
+    font-size: 1.3rem;
+    margin: 0 0 20px 0;
+    color: #2d3748;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Weather Card */
+.weather-days-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.weather-day-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    padding: 20px;
+    color: white;
+}
+
+.weather-day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 12px;
+}
+
+.weather-day-header h4 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.weather-sun-times {
+    display: flex;
+    gap: 12px;
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.weather-periods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.weather-period {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    backdrop-filter: blur(10px);
+}
+
+.period-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+.period-icon {
+    font-size: 1.2rem;
+}
+
+.period-name {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.period-details {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.period-details .weather-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.period-details .weather-info {
+    flex: 1;
+}
+
+.period-details .weather-temp {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+}
+
+.period-details .weather-condition {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    margin-bottom: 6px;
+}
+
+.period-details .weather-rain {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    margin-bottom: 6px;
+}
+
+.period-details .weather-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    opacity: 0.8;
+    gap: 8px;
+}
+
+.period-details .weather-details span {
+    flex: 1;
+    text-align: center;
+}
+
+/* Legacy weather grid styles for fallback */
+.weather-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+}
+
+.weather-day {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+    color: white;
+}
+
+.weather-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.weather-info {
+    font-size: 0.9rem;
+}
+
+.weather-temp {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 4px 0;
+}
+
+.weather-date {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.weather-condition {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin-bottom: 8px;
+}
+
+.weather-rain {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    margin: 2px 0;
+}
+
+.weather-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    opacity: 0.9;
+    margin: 4px 0;
+    gap: 8px;
+}
+
+.weather-details span {
+    flex: 1;
+    text-align: center;
+}
+
+.weather-sun {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    opacity: 0.9;
+    margin-top: 6px;
+    gap: 8px;
+}
+
+.weather-sun span {
+    flex: 1;
+    text-align: center;
+}
+
+/* Hotels Card */
+.hotels-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+}
+
+.hotel-item {
+    background: #f8fafc;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.hotel-item:hover {
+    background: #edf2f7;
+    transform: translateY(-1px);
+}
+
+.hotel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.hotel-header h4 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.hotel-rating {
+    background: #48bb78;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.hotel-address,
+.hotel-distance {
+    font-size: 0.9rem;
+    color: #718096;
+    margin-bottom: 4px;
+}
+
+/* Restaurants Card */
+.restaurants-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.restaurant-item {
+    background: #f8fafc;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.restaurant-item:hover {
+    background: #edf2f7;
+    transform: translateY(-1px);
+}
+
+.restaurant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.restaurant-header h4 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.restaurant-cuisine {
+    background: #ed8936;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.restaurant-address {
+    font-size: 0.9rem;
+    color: #718096;
+    margin-bottom: 12px;
+}
+
+.restaurant-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.view-map-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.view-map-btn:hover {
+    background: #5a67d8;
+}
+
+/* Tourist Spots Card */
+.spots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+}
+
+.spot-item {
+    background: #f8fafc;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.spot-item:hover {
+    background: #edf2f7;
+    transform: translateY(-1px);
+}
+
+.spot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.spot-header h4 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.spot-type {
+    background: #9f7aea;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.spot-address {
+    font-size: 0.9rem;
+    color: #718096;
+    margin-bottom: 8px;
+}
+
+.spot-description {
+    font-size: 0.9rem;
+    color: #4a5568;
+    line-height: 1.4;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.save-trip-btn,
+.export-btn,
+.share-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.save-trip-btn {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: white;
+}
+
+.save-trip-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+}
+
+.export-btn {
+    background: linear-gradient(135deg, #ed8936, #dd6b20);
+    color: white;
+}
+
+.export-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(237, 137, 54, 0.4);
+}
+
+.export-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.share-btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.share-btn:hover {
+    transform: translateY(-1px);    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* Enhanced LLM Trip Plan Styles */
+.llm-plan-card {
+    background: linear-gradient(135deg, #f8f9ff 0%, #e8f4fd 100%);
+    border: 2px solid #e3f2fd;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(79, 172, 254, 0.1);
+}
+
+.llm-plan-header {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    padding: 24px;
+    text-align: center;
+    margin: -24px -24px 24px -24px;
+}
+
+.llm-plan-header h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.llm-plan-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+.llm-summary-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    border-left: 4px solid #4facfe;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.summary-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.summary-content h4 {
+    margin: 0 0 8px 0;
+    color: #2c3e50;
+    font-size: 1.1rem;
+}
+
+.summary-content p {
+    margin: 0;
+    color: #5a6c7d;
+    line-height: 1.6;
+}
+
+.section-title {
+    color: #2c3e50;
+    font-size: 1.2rem;
+    margin: 0 0 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.llm-days-container {
+    margin-bottom: 24px;
+}
+
+.llm-days-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.llm-day-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e8f4fd;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.llm-day-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.day-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.day-number {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    backdrop-filter: blur(10px);
+}
+
+.day-title h5 {
+    margin: 0 0 4px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.day-date {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.day-content {
+    padding: 20px;
+}
+
+.day-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 16px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.day-section:last-child {
+    margin-bottom: 0;
+}
+
+.activities-section {
+    background: #f8f9ff;
+    border-left: 3px solid #4facfe;
+}
+
+.meals-section {
+    background: #fff8f0;
+    border-left: 3px solid #ff9500;
+}
+
+.hotel-section {
+    background: #f0f8ff;
+    border-left: 3px solid #007bff;
+}
+
+.notes-section {
+    background: #f5f8f0;
+    border-left: 3px solid #28a745;
+}
+
+.section-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.section-content {
+    flex: 1;
+}
+
+.section-content h6 {
+    margin: 0 0 12px 0;
+    color: #2c3e50;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.activities-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+}
+
+.activity-bullet {
+    color: #4facfe;
+    font-weight: bold;
+    margin-top: 2px;
+}
+
+.meals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.meal-item {
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ffe4b5;
+}
+
+.meal-type {
+    font-weight: 600;
+    color: #ff9500;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.meal-description {
+    color: #5a6c7d;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.hotel-info {
+    color: #5a6c7d;
+    line-height: 1.5;
+}
+
+.hotel-name {
+    font-weight: 600;
+    color: #007bff;
+    margin-bottom: 4px;
+}
+
+.hotel-address, .hotel-price {
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+}
+
+.notes-content {
+    color: #5a6c7d;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+.llm-budget-section {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e8f4fd;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.budget-container {
+    margin-top: 16px;
+}
+
+.budget-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.budget-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.budget-item.total-budget {
+    background: #2e7d32;
+    color: white;
+    font-weight: 600;
+}
+
+/* Enhanced Travel Plan Styles */
+.enhanced-trip-plan {
+    background: linear-gradient(135deg, #f8faff 0%, #ffffff 100%);
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.trip-plan-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.trip-plan-header h3 {
+    font-size: 2rem;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+}
+
+.trip-plan-header p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+/* Trip Summary Card */
+.trip-summary-card {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    margin: 30px;
+    border-radius: 15px;
+    padding: 25px;
+    color: white;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 20px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.summary-icon {
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+}
+
+.summary-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 5px;
+}
+
+.summary-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+/* Daily Itinerary */
+.daily-itinerary-container {
+    padding: 30px;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    color: #2d3748;
+    margin-bottom: 25px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.enhanced-day-card {
+    background: white;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.enhanced-day-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+.day-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.day-number-badge {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    backdrop-filter: blur(10px);
+}
+
+.day-info h5 {
+    margin: 0 0 5px 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.day-date {
+    opacity: 0.9;
+    font-size: 1rem;
+}
+
+.day-weather {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+/* Activity Cards */
+.day-activities-grid {
+    padding: 25px;
+    display: grid;
+    gap: 20px;
+}
+
+.activity-card {
+    background: linear-gradient(135deg, #f8faff 0%, #ffffff 100%);
+    border-radius: 15px;
+    padding: 20px;
+    border-left: 4px solid #4facfe;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.activity-card.morning {
+    border-left-color: #fbbf24;
+}
+
+.activity-card.afternoon {
+    border-left-color: #3b82f6;
+}
+
+.activity-time {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    color: #4a5568;
+    font-weight: 600;
+}
+
+.time-icon {
+    font-size: 1.2rem;
+}
+
+.activity-content h6 {
+    color: #2d3748;
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.activity-content p {
+    color: #718096;
+    margin: 0 0 15px 0;
+    line-height: 1.6;
+}
+
+.entry-fee {
+    background: #e6fffa;
+    color: #00b894;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.activity-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+/* Meal Options */
+.meal-options-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    border: 2px solid #f7fafc;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.meal-options-card.lunch {
+    border-color: #fed7d7;
+}
+
+.meal-options-card.dinner {
+    border-color: #e9d8fd;
+}
+
+.meal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.meal-icon {
+    font-size: 1.5rem;
+}
+
+.meal-header h6 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.restaurant-option {
+    background: #f8faff;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.restaurant-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.restaurant-name {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.restaurant-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.restaurant-details span {
+    background: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+}
+
+.cuisine {
+    background: #f0fff4 !important;
+    color: #00b894 !important;
+}
+
+.cost {
+    background: #fffbeb !important;
+    color: #d69e2e !important;
+}
+
+.rating {
+    background: #fef5e7 !important;
+    color: #dd6b20 !important;
+}
+
+/* Afternoon Activities */
+.afternoon-spots {
+    display: grid;
+    gap: 15px;
+}
+
+.afternoon-spot {
+    background: #f8faff;
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 3px solid #4facfe;
+}
+
+.afternoon-spot h6 {
+    margin: 0 0 8px 0;
+    color: #2d3748;
+    font-weight: 600;
+}
+
+.afternoon-spot p {
+    margin: 0 0 10px 0;
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+.spot-details {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.spot-details span {
+    background: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+}
+
+/* Accommodation */
+.accommodation-card {
+    background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+    border-radius: 15px;
+    padding: 20px;
+    border: 2px solid #dbeafe;
+}
+
+.accommodation-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.accommodation-icon {
+    font-size: 1.5rem;
+}
+
+.accommodation-header h6 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.hotel-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+.hotel-option {
+    background: white;
+    padding: 18px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hotel-option:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.hotel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.hotel-name {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 1rem;
+}
+
+.hotel-rating {
+    background: #fef5e7;
+    color: #dd6b20;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.hotel-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hotel-price {
+    font-weight: 600;
+    color: #00b894;
+    font-size: 1rem;
+}
+
+.hotel-amenities {
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+/* Day Budget */
+.day-budget-card {
+    background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 20px;
+    border: 2px solid #fed7d7;
+}
+
+.day-budget-card h6 {
+    margin: 0 0 15px 0;
+    color: #2d3748;
+    font-weight: 600;
+}
+
+.budget-items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.budget-item-small {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.budget-category {
+    font-size: 0.9rem;
+    color: #4a5568;
+}
+
+.budget-amount {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.budget-total-small {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #667eea;
+    color: white;
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-weight: 600;
+    grid-column: 1 / -1;
+}
+
+/* Enhanced Budget Summary */
+.enhanced-budget-summary {
+    background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+    padding: 30px;
+    margin: 30px;
+    border-radius: 20px;
+    border-top: 4px solid #4facfe;
+}
+
+.budget-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.budget-summary-item {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s ease;
+}
+
+.budget-summary-item:hover {
+    transform: translateY(-3px);
+}
+
+.budget-icon {
+    font-size: 2rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    color: white;
+}
+
+.budget-details {
+    flex: 1;
+}
+
+.budget-category-name {
+    font-size: 0.9rem;
+    color: #718096;
+    margin-bottom: 5px;
+}
+
+.budget-amount-large {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+/* Total Budget Card */
+.total-budget-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.total-budget-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.total-label {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.total-amount {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.remaining-budget {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 12px 20px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .travel-planner {
+        padding: 10px;
+    }
+    
+    .planner-header {
+        padding: 30px 20px;
+    }
+    
+    .planner-header h1 {
+        font-size: 2rem;
+    }
+    
+    .planner-form,
+    .trip-results {
+        padding: 20px;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .trip-summary {
+        gap: 12px;
+    }
+    
+    .hotels-grid,
+    .restaurants-grid,
+    .spots-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .llm-plan-header {
+        padding: 20px 16px;
+        margin: -16px -16px 20px -16px;
+    }
+    
+    .llm-summary-section {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+    
+    .day-header {
+        padding: 12px 16px;
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+    
+    .day-number {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .day-content {
+        padding: 16px;
+    }
+    
+    .day-section {
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px;
+    }
+    
+    .section-icon {
+        align-self: flex-start;
+    }
+    
+    .meals-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .budget-item {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+    
+    .budget-total {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+    
+    .day-activities-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .total-budget-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .budget-breakdown-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .day-header-enhanced {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+    
+    .activity-details, .meal-details, .hotel-details {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .enhanced-trip-plan {
+        margin: 10px;
+    }
+    
+    .daily-itinerary-container {
+        padding: 15px;
+    }
+    
+    .enhanced-budget-summary {
+        margin: 15px;
+        padding: 20px;
+    }
+    
+    .budget-items-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Enhanced animations */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.enhanced-day-card {
+    animation: slideInUp 0.6s ease-out;
+}
+
+.enhanced-day-card:nth-child(odd) {
+    animation-delay: 0.1s;
+}
+
+.enhanced-day-card:nth-child(even) {
+    animation-delay: 0.2s;
+}
