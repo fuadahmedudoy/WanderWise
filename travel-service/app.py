@@ -111,7 +111,12 @@ def plan_trip():
             budget=budget,
             weather_data=weather_data,
             city_data=city_data
-        )# Parse the AI response
+        )
+        # Print the raw AI response for debugging
+        print("📝 RAW AI RESPONSE START ===============================")
+        print(trip_plan_response)
+        print("📝 RAW AI RESPONSE END   ===============================")
+        # Parse the AI response
         try:
             # Clean the response by removing markdown code blocks if present
             cleaned_response = trip_plan_response.strip()

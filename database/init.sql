@@ -392,8 +392,8 @@ ALTER TABLE ONLY public.user_sessions
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_email_key UNIQUE (email);
 
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+-- ALTER TABLE ONLY public.users
+--     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_username_key UNIQUE (username);
@@ -464,17 +464,17 @@ ALTER TABLE ONLY public.user_roles
 ALTER TABLE ONLY public.user_sessions
     ADD CONSTRAINT user_sessions_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
-ALTER TABLE ONLY travel_cities
-    ADD CONSTRAINT travel_cities_pkey PRIMARY KEY (id);
+-- ALTER TABLE ONLY travel_cities
+--     ADD CONSTRAINT travel_cities_pkey PRIMARY KEY (id);
 
-ALTER TABLE ONLY travel_spots
-    ADD CONSTRAINT travel_spots_pkey PRIMARY KEY (id);
+-- ALTER TABLE ONLY travel_spots
+--     ADD CONSTRAINT travel_spots_pkey PRIMARY KEY (id);
 
-ALTER TABLE ONLY travel_hotels
-    ADD CONSTRAINT travel_hotels_pkey PRIMARY KEY (id);
+-- ALTER TABLE ONLY travel_hotels
+--     ADD CONSTRAINT travel_hotels_pkey PRIMARY KEY (id);
 
-ALTER TABLE ONLY travel_restaurants
-    ADD CONSTRAINT travel_restaurants_pkey PRIMARY KEY (id);
+-- ALTER TABLE ONLY travel_restaurants
+--     ADD CONSTRAINT travel_restaurants_pkey PRIMARY KEY (id);
 
 -- Travel data for destinations
 -- Insert cities into travel_cities table

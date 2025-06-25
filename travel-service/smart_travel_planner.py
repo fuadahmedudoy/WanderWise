@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 # LangSmith imports for tracing
-from langsmith import traceable
-from langsmith.wrappers import wrap_openai
+# from langsmith import traceable
+# from langsmith.wrappers import wrap_openai
 
 # Import weather agent only (city data now comes from Spring Boot)
 from weather_agent import get_weather
@@ -14,14 +14,15 @@ from weather_agent import get_weather
 # Load environment variables
 load_dotenv()
 
-# Initialize LangSmith environment variables
-os.environ["LANGCHAIN_TRACING_V2"] = os.getenv("LANGCHAIN_TRACING_V2", "true")
-os.environ["LANGCHAIN_ENDPOINT"] = os.getenv("LANGCHAIN_ENDPOINT", "https://api.smith.langchain.com")
-os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY", "")
-os.environ["LANGCHAIN_PROJECT"] = os.getenv("LANGCHAIN_PROJECT", "wanderwise")
+# # Initialize LangSmith environment variables
+# os.environ["LANGCHAIN_TRACING_V2"] = os.getenv("LANGCHAIN_TRACING_V2", "true")
+# os.environ["LANGCHAIN_ENDPOINT"] = os.getenv("LANGCHAIN_ENDPOINT", "https://api.smith.langchain.com")
+# os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY", "")
+# os.environ["LANGCHAIN_PROJECT"] = os.getenv("LANGCHAIN_PROJECT", "wanderwise")
 
 # Initialize OpenAI client with LangSmith wrapper
-client = wrap_openai(OpenAI(api_key=os.getenv("OPENAI_API_KEY")))
+key= os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def generate_trip_plan(origin, destination, start_date, day_count, budget, weather_data, city_data):
     """
@@ -40,6 +41,7 @@ def generate_trip_plan(origin, destination, start_date, day_count, budget, weath
         str: Generated trip plan from the LLM
     """
       # Format weather data for the prompt
+    print("🌤️The key...", key)
     weather_info = ""
     if isinstance(weather_data, list):
         for i, weather in enumerate(weather_data[:day_count]):

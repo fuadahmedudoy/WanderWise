@@ -40,9 +40,9 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: "true"
       SERVER_PORT: 8080
-      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_REDIRECT_URI: ${BACKEND_DOMAIN_URL}/login/oauth2/code/google
-      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      # SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_REDIRECT_URI: ${BACKEND_DOMAIN_URL}/login/oauth2/code/google
+      # SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      # SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       PYTHON_TRAVEL_SERVICE_URL: http://travel-service:5001
     ports:
       - "8080:8080"
@@ -62,7 +62,6 @@ services:
       - wanderwise-network
     # environment:
     #   - REACT_APP_API_URL=${REACT_APP_API_URL}
-
   # Python Travel Service
   travel-service:
     build: ./travel-service
@@ -73,6 +72,11 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/wanderwise
+      DATABASE_FILE: database.json
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENTRIPMAP_API_KEY: ${OPENTRIPMAP_API_KEY}
+      ORS_API_KEY: ${ORS_API_KEY}
+
     ports:
       - "5001:5001"
     networks:

@@ -74,7 +74,7 @@ public class CityDataService {
             // You may want to fetch actual city info from DB, here it's just a placeholder
             if (!spotResults.isEmpty()) {
                 Object[] firstSpot = spotResults.get(0);
-                city.put("id", firstSpot[6]); // Adjust index as per your DB schema
+                city.put("id", null); // Fix: avoid index out of bounds, or fetch city id separately if needed
                 city.put("name", destination);
             }
 
