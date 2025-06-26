@@ -83,3 +83,11 @@ body {
   border-radius: 5px;
   margin-bottom: 20px;
 }
+
+.success-message {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}

@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import AuthContext from './context/AuthContext';
 import Login from './pages/auth/Login';
 import Signup from './pages/auth/Signup';
+import OtpVerification from './pages/auth/OtpVerification';
 import OAuthSuccess from './pages/auth/OAuthSuccess';
 import Home from './pages/Home';
 import CreateTrip from './pages/CreateTrip';
@@ -19,6 +20,7 @@ function App() {
         <Routes>
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/signup" element={<Signup />} />
+          <Route path="/auth/verify-otp" element={<OtpVerification />} />
           <Route path="/oauth-success" element={<OAuthSuccess />} />
           <Route path="/" element={<Home />} />
           <Route path="/destination/:id" element={<DestinationDetail />} />

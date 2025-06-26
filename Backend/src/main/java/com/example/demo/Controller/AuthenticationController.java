@@ -4,9 +4,11 @@ import com.example.demo.SecurityConfigurations.JwtUtility;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.RegisterRequest;
+import com.example.demo.dto.OtpVerificationRequest;
 import com.example.demo.entity.User;
 import com.example.demo.service.TokenBlacklistService;
 import com.example.demo.service.UserProfileService;
+import com.example.demo.service.OtpService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -44,6 +46,9 @@ public class AuthenticationController {
 
     @Autowired
     private TokenBlacklistService tokenBlacklistService;
+
+    @Autowired
+    private OtpService otpService;
 
     // This is no longer needed for registration
     // @Autowired
@@ -90,11 +95,28 @@ public class AuthenticationController {
     @PostMapping("/signup")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
         try {
-            // The service now handles both User and UserProfile creation
-            User user = userService.registerNewUserAccount(registerRequest);
+            // Initiate registration with OTP
+            otpService.initiateRegistration(registerRequest);
             
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "User registered successfully");
+            response.put("message", "OTP sent to your email. Please verify to complete registration.");
+            response.put("email", registerRequest.getEmail());
+            
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<?> verifyOtp(@Valid @RequestBody OtpVerificationRequest otpRequest) {
+        try {
+            User user = otpService.verifyOtpAndCompleteRegistration(otpRequest.getEmail(), otpRequest.getOtp());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Registration completed successfully");
             response.put("username", user.getUsername());
             
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -104,7 +126,75 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
     }
-    
+
+    @PostMapping("/resend-otp")
+    public ResponseEntity<?> resendOtp(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            if (email == null || email.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Email is required"));
+            }
+            
+            otpService.resendOtp(email);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "OTP resent successfully");
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
+    @PostMapping("/test-email")
+    public ResponseEntity<?> testEmail(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            if (email == null || email.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Email is required"));
+            }
+            
+            // Generate a test OTP
+            String testOtp = "123456";
+            
+            // Try to send email using the email service
+            otpService.getEmailService().sendOtpEmail(email, testOtp);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Test email sent successfully to " + email);
+            response.put("testOtp", testOtp);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Failed to send test email: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
+    @PostMapping("/cleanup-pending")
+    public ResponseEntity<?> cleanupPendingRegistrations(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            if (email == null || email.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Email is required"));
+            }
+            
+            otpService.cleanupPendingRegistrationByEmail(email);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Pending registration cleaned up for email: " + email);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Failed to cleanup: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
     // ... (the rest of the controller remains the same)
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {

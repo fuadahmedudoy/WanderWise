@@ -196,6 +196,16 @@ CREATE TABLE public.user_profiles (
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
 );
 
+-- CREATE TABLE public.pending_registrations (
+--     id uuid DEFAULT gen_random_uuid() NOT NULL,
+--     email character varying(255) NOT NULL UNIQUE,
+--     username character varying(255) NOT NULL,
+--     password character varying(255) NOT NULL,
+--     otp character varying(6) NOT NULL,
+--     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+--     expires_at timestamp with time zone NOT NULL
+-- );
+
 CREATE TABLE public.user_roles (
     user_id uuid NOT NULL,
     role character varying(20) DEFAULT 'USER'::character varying NOT NULL,

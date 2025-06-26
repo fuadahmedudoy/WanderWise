@@ -79,6 +79,7 @@ public class SecurityConfiguration {
                         .requestMatchers(OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/login", "/api/register", "/api/signup", "/api/ping",
                                 "/login/oauth2/code/**", "/oauth2/**", "/oauth2/authorization/**",
+                                "/api/verify-otp", "/api/resend-otp", "/api/cleanup-pending",
                                 "/api/destinations/featured", "/api/destinations/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2

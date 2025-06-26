@@ -31,8 +31,12 @@ const Signup = () => {
       setError('');
       setLoading(true);
       // Only send the fields that the backend expects: email, password, username
-      await signup(email, password, { username });
-      navigate('/auth/login');
+      const response = await signup(email, password, { username });
+      
+      // Navigate to OTP verification page with email
+      navigate('/auth/verify-otp', { 
+        state: { email } 
+      });
     } catch (error) {
       setError(error.message || 'Failed to create an account');
       console.error(error);
