@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Configuration
@@ -15,15 +16,11 @@ public class MvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String resolvedPath = Paths.get(uploadDir).toAbsolutePath().normalize().toString();
-        // On Windows, the path might start with a drive letter like C:\. 
-        // We need to format it for the resource handler.
-        if (resolvedPath.matches("^[a-zA-Z]:\\\\.*")) {
-            resolvedPath = "file:///" + resolvedPath.replace("\\", "/") + "/";
-        } else {
-            resolvedPath = "file:" + resolvedPath + "/";
-        }
-        
+        // This platform-independent way to configure the resource handler.
+        // It correctly creates a 'file:' URI for both Windows and Linux environments.
+        Path uploadPath = Paths.get(uploadDir);
+        String resolvedPath = uploadPath.toUri().toString();
+
         registry
             .addResourceHandler("/uploads/**")
             .addResourceLocations(resolvedPath);
