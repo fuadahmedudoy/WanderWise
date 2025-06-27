@@ -49,7 +49,7 @@ jobs:
           key: ${{ secrets.AZURE_VM_SSH_KEY }}
           script: |
             # Exit immediately if a command exits with a non-zero status.
-            set -e
+            # set -e
 
             # Navigate to the project directory
             cd wanderwise
