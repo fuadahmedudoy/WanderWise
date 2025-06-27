@@ -56,6 +56,11 @@ services:
       SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_REQUIRED: "true"
       SPRING_MAIL_PROPERTIES_MAIL_SMTP_SSL_TRUST: smtp.gmail.com
       SPRING_MAIL_PROPERTIES_MAIL_DEBUG: "true"
+
+      #File upload config
+      FILE_UPLOAD_DIR: /app/uploads  
+    volumes:
+      - app_uploads:/app/uploads  
       
     ports:
       - "8080:8080"

@@ -7,8 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/profile")
@@ -23,7 +22,10 @@ public class UserProfileController {
     }
 
     @PutMapping
-    public ResponseEntity<UserProfileDTO> updateUserProfile(@AuthenticationPrincipal User user, @RequestBody UserProfileDTO userProfileDTO) {
-        return ResponseEntity.ok(userProfileService.updateUserProfile(user.getId(), userProfileDTO));
+    public ResponseEntity<UserProfileDTO> updateUserProfile(
+            @AuthenticationPrincipal User user,
+            @RequestPart("profile") UserProfileDTO userProfileDTO,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+        return ResponseEntity.ok(userProfileService.updateUserProfile(user.getId(), userProfileDTO, file));
     }
 }

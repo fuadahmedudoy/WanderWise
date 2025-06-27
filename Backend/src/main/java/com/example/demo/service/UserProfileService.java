@@ -8,6 +8,8 @@ import com.example.demo.entity.UserProfile;
 import com.example.demo.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.UUID;
 
 @Service
@@ -19,13 +21,16 @@ public class UserProfileService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private FileStorageService storageService;
+
     public UserProfileDTO getUserProfile(UUID userId) {
         // FIX: Find the profile, or create a new one if it doesn't exist.
         UserProfile userProfile = userProfileRepository.findById(userId)
                 .orElseGet(() -> {
                     User user = userRepository.findById(userId)
                             .orElseThrow(() -> new ResourceNotFoundException("Cannot create profile for a non-existent user with id: " + userId));
-                    
+
                     UserProfile newProfile = new UserProfile();
                     newProfile.setUser(user);
                     newProfile.setUserId(user.getId());
@@ -34,10 +39,10 @@ public class UserProfileService {
         return toDTO(userProfile);
     }
 
-    public UserProfileDTO updateUserProfile(UUID userId, UserProfileDTO userProfileDTO) {
+    public UserProfileDTO updateUserProfile(UUID userId, UserProfileDTO userProfileDTO, MultipartFile file) {
         UserProfile userProfile = userProfileRepository.findById(userId)
                 .orElseGet(() -> {
-                     User user = userRepository.findById(userId)
+                    User user = userRepository.findById(userId)
                             .orElseThrow(() -> new ResourceNotFoundException("Cannot update profile for a non-existent user with id: " + userId));
 
                     UserProfile newProfile = new UserProfile();
@@ -45,12 +50,16 @@ public class UserProfileService {
                     newProfile.setUserId(user.getId());
                     return newProfile;
                 });
-        
+
+        if (file != null && !file.isEmpty()) {
+            String fileUrl = storageService.save(file);
+            userProfile.setProfilePictureUrl(fileUrl);
+        }
+
         userProfile.setBio(userProfileDTO.getBio());
-        userProfile.setProfilePictureUrl(userProfileDTO.getProfilePictureUrl());
         userProfile.setFirstName(userProfileDTO.getFirstName());
         userProfile.setLastName(userProfileDTO.getLastName());
-        
+
         UserProfile savedProfile = userProfileRepository.save(userProfile);
         return toDTO(savedProfile);
     }
