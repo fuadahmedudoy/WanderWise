@@ -33,7 +33,7 @@ services:
         condition: service_healthy
     environment:
       frontend.origin: ${FRONTEND_URL}
-      # frontend.origin: http://frontend ( did not work :'3 )
+      backend-url: ${BACKEND_URL}
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/wanderwise
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres

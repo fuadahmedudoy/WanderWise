@@ -24,6 +24,9 @@ public class UserProfileService {
     @Autowired
     private FileStorageService storageService;
 
+    @Value("${backend-url}")
+    private String backendUrl;
+
     public UserProfileDTO getUserProfile(UUID userId) {
         // FIX: Find the profile, or create a new one if it doesn't exist.
         UserProfile userProfile = userProfileRepository.findById(userId)
@@ -52,8 +55,9 @@ public class UserProfileService {
                 });
 
         if (file != null && !file.isEmpty()) {
-            String fileUrl = storageService.save(file);
-            userProfile.setProfilePictureUrl(fileUrl);
+            String relativePath = storageService.save(file);
+            String fullUrl = backendUrl + relativePath;
+            userProfile.setProfilePictureUrl(fullUrl);
         }
 
         userProfile.setBio(userProfileDTO.getBio());
