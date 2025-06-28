@@ -75,6 +75,8 @@ services:
       - backend
     ports:
       - "3000:80"
+    volumes:
+      - ./uploads:/usr/share/nginx/html/uploads
     networks:
       - wanderwise-network
     # environment:
