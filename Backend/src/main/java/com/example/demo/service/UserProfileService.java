@@ -56,8 +56,8 @@ public class UserProfileService {
 
         if (file != null && !file.isEmpty()) {
             String relativePath = storageService.save(file);
-            String fullUrl = backendUrl + relativePath;
-            userProfile.setProfilePictureUrl(fullUrl);
+            //String fullUrl = backendUrl + relativePath;
+            userProfile.setProfilePictureUrl(relativePath);
         }
 
         userProfile.setBio(userProfileDTO.getBio());
