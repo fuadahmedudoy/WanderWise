@@ -76,62 +76,11 @@ CREATE TABLE public.password_reset_tokens (
     used boolean DEFAULT false
 );
 
-CREATE TABLE public.trip_accommodations (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    trip_plan_id uuid NOT NULL,
-    day_number integer NOT NULL,
-    title character varying(255) NOT NULL,
-    address text,
-    latitude numeric(10,7),
-    longitude numeric(10,7),
-    rating numeric(3,1),
-    rating_count integer,
-    category character varying(100),
-    phone_number character varying(50),
-    website text
-);
 
-CREATE TABLE public.trip_food_options (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    trip_plan_id uuid NOT NULL,
-    day_number integer NOT NULL,
-    meal_type character varying(50) NOT NULL,
-    title character varying(255) NOT NULL,
-    address text,
-    latitude numeric(10,7),
-    longitude numeric(10,7),
-    rating numeric(3,1),
-    rating_count integer,
-    category character varying(100),
-    phone_number character varying(50),
-    website text,
-    cost character varying(20),
-    CONSTRAINT trip_food_options_meal_type_check CHECK (((meal_type)::text = ANY ((ARRAY['breakfast'::character varying, 'lunch'::character varying, 'dinner'::character varying, 'snack'::character varying])::text[])))
-);
 
-CREATE TABLE public.trip_plans (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    user_id uuid NOT NULL,
-    trip_name character varying(255) NOT NULL,
-    origin character varying(255) NOT NULL,
-    destination character varying(255) NOT NULL,
-    days integer NOT NULL,
-    budget_total numeric(10,2) NOT NULL,
-    budget_breakdown jsonb NOT NULL,
-    people integer NOT NULL,
-    preferences text,
-    trip_type character varying(50) DEFAULT 'Solo'::character varying NOT NULL,
-    start_date date NOT NULL,
-    end_date date NOT NULL,
-    journey_date date,
-    transportation_type character varying(50) DEFAULT 'Bus'::character varying,
-    status character varying(20) DEFAULT 'ACTIVE'::character varying NOT NULL,
-    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT trip_plans_status_check CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'COMPLETED'::character varying, 'CANCELLED'::character varying])::text[]))),
-    CONSTRAINT trip_plans_transportation_type_check CHECK (((transportation_type)::text = ANY ((ARRAY['Bus'::character varying, 'Launch'::character varying, 'Train'::character varying, 'Plane'::character varying])::text[]))),
-    CONSTRAINT trip_plans_trip_type_check CHECK (((trip_type)::text = ANY ((ARRAY['Solo'::character varying, 'Group'::character varying])::text[])))
-);
+
+
+
 
 CREATE TABLE public.trip_requests (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -157,16 +106,7 @@ CREATE TABLE public.trip_requests (
     CONSTRAINT trip_requests_trip_type_check CHECK (((trip_type)::text = ANY ((ARRAY['solo'::character varying, 'group'::character varying])::text[])))
 );
 
-CREATE TABLE public.trip_spot_suggestions (
-    id uuid DEFAULT gen_random_uuid() NOT NULL,
-    trip_plan_id uuid NOT NULL,
-    name character varying(255) NOT NULL,
-    description text,
-    latitude numeric(10,7),
-    longitude numeric(10,7),
-    recommended_time character varying(100),
-    estimated_duration_hours numeric(4,1)
-);
+
 
 CREATE TABLE public.trip_todolist (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
