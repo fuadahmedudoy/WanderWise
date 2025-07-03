@@ -30,8 +30,8 @@ public class TripAccommodation {
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
-    private String address;
+    // @Column(columnDefinition = "TEXT")
+    // private String address;
 
     @Column(precision = 10, scale = 7)
     private BigDecimal latitude;
@@ -51,6 +51,6 @@ public class TripAccommodation {
     @Column(name = "phone_number", length = 50)
     private String phoneNumber;
 
-    @Column(columnDefinition = "TEXT")
-    private String website;
+    // @Column(columnDefinition = "TEXT")
+    // private String website;
 }

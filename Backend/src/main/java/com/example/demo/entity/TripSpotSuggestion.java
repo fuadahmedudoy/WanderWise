@@ -27,8 +27,8 @@ public class TripSpotSuggestion {
     @Column(nullable = false)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
+    // @Column(columnDefinition = "TEXT")
+    // private String description;
 
     @Column(precision = 10, scale = 7)
     private BigDecimal latitude;

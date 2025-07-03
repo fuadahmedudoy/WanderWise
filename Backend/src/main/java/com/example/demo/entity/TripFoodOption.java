@@ -33,8 +33,8 @@ public class TripFoodOption {
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
-    private String address;
+    // @Column(columnDefinition = "TEXT")
+    // private String address;
 
     @Column(precision = 10, scale = 7)
     private BigDecimal latitude;
@@ -54,8 +54,8 @@ public class TripFoodOption {
     @Column(name = "phone_number", length = 50)
     private String phoneNumber;
 
-    @Column(columnDefinition = "TEXT")
-    private String website;
+    // @Column(columnDefinition = "TEXT")
+    // private String website;
 
     @Column(length = 20)
     private String cost;
