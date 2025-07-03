@@ -563,6 +563,7 @@
     flex-wrap: wrap;
 }
 
+.accept-trip-btn,
 .save-trip-btn,
 .export-btn,
 .share-btn {
@@ -573,6 +574,22 @@
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 1rem;
+}
+
+.accept-trip-btn {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: white;
+}
+
+.accept-trip-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+}
+
+.accept-trip-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .save-trip-btn {

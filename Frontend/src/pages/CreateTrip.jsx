@@ -127,19 +127,13 @@ const CreateTrip = () => {
     // Save trip functionality
     try {
       const token = localStorage.getItem('token');
-      const tripData = {
-        ...formData,
-        plan: tripPlan,
-        status: 'accepted'
-      };
-      
-      const response = await fetch('http://localhost:5001/save-trip', {
+      const response = await fetch('http://localhost:8080/api/trip/accept', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify(tripData)
+        body: JSON.stringify({ tripPlan: tripPlan })
       });
 
       if (response.ok) {

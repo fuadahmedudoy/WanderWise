@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { tripApi } from '../api';
 import '../styles/travel-planner.css';
 
 const TravelPlanner = () => {
@@ -14,6 +15,7 @@ const TravelPlanner = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [planData, setPlanData] = useState(null);
     const [error, setError] = useState('');
+    const [isAcceptingTrip, setIsAcceptingTrip] = useState(false);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -27,18 +29,12 @@ const TravelPlanner = () => {
         e.preventDefault();
         setIsLoading(true);
         setError('');        try {
-            const token = localStorage.getItem('token');
-            const headers = {
-                'Content-Type': 'application/json',
-            };
-            
-            if (token) {
-                headers.Authorization = `Bearer ${token}`;
-            }
-            
-            const response = await fetch('/api/travel/plan', {
+            const response = await fetch('http://localhost:8080/api/travel/plan', {
                 method: 'POST',
-                headers: headers,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
                 body: JSON.stringify(formData)
             });
 
@@ -84,7 +80,40 @@ const TravelPlanner = () => {
             if (lowerCondition.includes(key)) return icon;
         }
         return '🌤️';
-    };    // Export trip plan as JSON file
+    };
+
+    // Accept trip plan and save to database
+    const handleAcceptTrip = async () => {
+        console.log('🎯 Accept Trip button clicked!');
+        console.log('📊 Plan Data:', planData);
+        
+        if (!planData) {
+            console.log('❌ No plan data available');
+            return;
+        }
+        
+        setIsAcceptingTrip(true);
+        try {
+            console.log('📡 Making API call to accept trip...');
+            const response = await tripApi.acceptTrip(planData);
+            console.log('✅ API Response:', response);
+            
+            if (response.success) {
+                alert('🎉 Trip accepted successfully! You can view it in your trips section.');
+                // Optionally redirect to trips page
+                // navigate('/my-trips');
+            } else {
+                alert('❌ Failed to accept trip: ' + (response.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('❌ Error accepting trip:', error);
+            alert('❌ Failed to accept trip. Please try again.');
+        } finally {
+            setIsAcceptingTrip(false);
+        }
+    };
+
+    // Export trip plan as JSON file
     const handleExport = () => {
         if (planData) {
             const exportData = planData.trip_plan || planData;
@@ -658,14 +687,17 @@ const TravelPlanner = () => {
                         </div>                        {/* Action Buttons */}
                         <div className="action-buttons">
                             <button 
-                                className="save-trip-btn"
-                                onClick={() => {
-                                    // Save trip functionality
-                                    console.log('Saving trip...', planData);
-                                    alert('Trip saving functionality will be implemented soon!');
+                                type="button"
+                                className="accept-trip-btn"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleAcceptTrip();
                                 }}
+                                disabled={isAcceptingTrip || !planData}
+                                title={planData ? "Accept and save this trip plan" : "No plan available to accept"}
                             >
-                                💾 Save This Trip
+                                {isAcceptingTrip ? '⏳ Accepting...' : '✅ Accept This Trip'}
                             </button>                            <button 
                                 className="export-btn"
                                 onClick={handleExport}

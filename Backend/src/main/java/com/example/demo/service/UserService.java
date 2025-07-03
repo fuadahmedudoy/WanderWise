@@ -19,11 +19,11 @@ public class UserService {
 
     @Transactional
     public User registerNewUserAccount(RegisterRequest registerRequest) {
-        if (userRepository.findByUsername(registerRequest.getUsername()) != null) {
+        if (userRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
             throw new RuntimeException("Error: Username is already taken!");
         }
 
-        if (userRepository.findByEmail(registerRequest.getEmail()) != null) {
+        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
             throw new RuntimeException("Error: Email is already in use!");
         }
 
@@ -58,6 +58,6 @@ public class UserService {
     }
     
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmail(email).orElse(null);
     }
 }

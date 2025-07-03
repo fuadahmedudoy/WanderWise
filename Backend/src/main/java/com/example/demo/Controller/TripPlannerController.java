@@ -1,6 +1,7 @@
 package com.example.demo.Controller;
 
 import com.example.demo.service.TripPlannerService;
+import com.example.demo.service.AcceptedTripService;
 import com.example.demo.dto.TripPlanRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,10 @@ import java.util.Map;
 public class TripPlannerController {
 
     @Autowired
-    private TripPlannerService tripPlannerService;    @PostMapping("/plan")
+    private TripPlannerService tripPlannerService;
+
+    @Autowired
+    private AcceptedTripService acceptedTripService;    @PostMapping("/plan")
     public ResponseEntity<?> planTrip(@RequestBody TripPlanRequest request, Authentication authentication) {
         try {
             // Get authenticated user details
@@ -49,5 +53,50 @@ public class TripPlannerController {
             "status", "healthy",
             "service", "trip-planner-gateway"
         ));
+    }
+
+    /**
+     * Accept a trip plan and save it to database
+     */
+    @PostMapping("/accept")
+    public ResponseEntity<?> acceptTripPlan(@RequestBody Map<String, Object> request, Authentication authentication) {
+        try {
+            String userEmail = authentication.getName();
+            
+            // Extract trip plan from request
+            Map<String, Object> tripPlan = (Map<String, Object>) request.get("tripPlan");
+            if (tripPlan == null) {
+                return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "error", "Trip plan is required"
+                ));
+            }
+
+            // Accept and save the trip
+            var acceptedTrip = acceptedTripService.acceptTrip(userEmail, tripPlan);
+            
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Trip accepted and saved successfully",
+                "tripId", acceptedTrip.getId(),
+                "createdAt", acceptedTrip.getCreatedAt()
+            ));
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error accepting trip: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "error", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * Alternative endpoint for accepting trips (alias for /accept)
+     * Used by travel service or other components
+     */
+    @PostMapping("/save-trip")
+    public ResponseEntity<?> saveTripPlan(@RequestBody Map<String, Object> request, Authentication authentication) {
+        return acceptTripPlan(request, authentication);
     }
 }

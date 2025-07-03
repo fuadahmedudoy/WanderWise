@@ -229,6 +229,13 @@ CREATE TABLE public.users (
     role character varying(255)
 );
 
+CREATE TABLE public.accepted_trips (
+    id SERIAL PRIMARY KEY,
+    user_id uuid REFERENCES users(id) ON DELETE CASCADE,
+    trip_plan jsonb NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE travel_cities (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,

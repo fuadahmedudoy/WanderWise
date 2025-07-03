@@ -58,6 +58,21 @@ body {
   background-color: rgba(74, 128, 240, 0.1);
 }
 
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
 .btn-google {
   background-color: #fff;
   color: #333;

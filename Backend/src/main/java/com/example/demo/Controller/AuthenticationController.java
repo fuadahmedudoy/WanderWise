@@ -71,7 +71,7 @@ public class AuthenticationController {
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
             );
             
-            User userDetails = userRepository.findByEmail(loginRequest.getEmail());
+            User userDetails = userRepository.findByEmail(loginRequest.getEmail()).orElse(null);
             
             if (userDetails == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
@@ -211,7 +211,7 @@ public class AuthenticationController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
         }
         
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElse(null);
         
         if (user == null  ||!jwtUtility.validateToken(user, token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");

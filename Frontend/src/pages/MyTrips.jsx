@@ -2,7 +2,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
-import api from '../api'; // <-- Import api
+import { tripApi } from '../api'; // <-- Import tripApi
 import '../styles/trips.css';
 
 const MyTrips = () => {
@@ -10,15 +10,21 @@ const MyTrips = () => {
   const navigate = useNavigate();
   const [trips, setTrips] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   
   useEffect(() => {
     const fetchTrips = async () => {
       if (currentUser) {
         try {
-          const response = await api.get('/api/trips');
-          setTrips(response.data);
+          const response = await tripApi.getMyAcceptedTrips();
+          if (response.success) {
+            setTrips(response.trips);
+          } else {
+            setError(response.error || 'Failed to fetch trips');
+          }
         } catch (error) {
           console.error("Failed to fetch trips", error);
+          setError('Network error. Please try again.');
         } finally {
           setIsLoading(false);
         }
@@ -29,11 +35,6 @@ const MyTrips = () => {
     fetchTrips();
   }, [currentUser]);
 
-  // ... (rest of the component is the same)
-  const handleCreateTrip = () => {
-    navigate('/create-trip');
-  };
-  
   const handleLogin = () => {
     navigate('/auth/login');
   };
@@ -62,35 +63,90 @@ const MyTrips = () => {
       
       <div className="content-container">
         <div className="trips-header">
-          <h1>My Trips</h1>
-          <button onClick={handleCreateTrip} className="btn-primary">Create New Trip</button>
+          <h1>My Accepted Trips</h1>
+          <button onClick={() => navigate('/travel-planner')} className="btn-primary">
+            Plan New Trip
+          </button>
         </div>
         
         {isLoading ? (
-          <p>Loading trips...</p>
+          <div className="loading-container">
+            <p>Loading your accepted trips...</p>
+          </div>
+        ) : error ? (
+          <div className="error-container">
+            <p className="error-message">{error}</p>
+            <button onClick={() => window.location.reload()} className="btn-primary">
+              Try Again
+            </button>
+          </div>
         ) : trips.length > 0 ? (
           <div className="trips-list">
-            {trips.map(trip => (
-              <div key={trip.id} className="trip-card">
-                <div className="trip-info">
-                  <h3>{trip.name}</h3>
-                  <p className="trip-destination">{trip.destination}</p>
-                  <p className="trip-dates">
-                    {new Date(trip.startDate).toLocaleDateString()} - 
-                    {new Date(trip.endDate).toLocaleDateString()}
-                  </p>
-                  <span className={`trip-status ${trip.status}`}>{trip.status}</span>
+            {trips.map(trip => {
+              // Extract trip summary data from the nested structure
+              const tripSummary = trip.tripPlan?.trip_summary || {};
+              const destination = tripSummary.destination || trip.tripPlan?.destination || 'Unknown Destination';
+              const duration = tripSummary.duration || trip.tripPlan?.duration_days || null;
+              const budget = tripSummary.total_budget || trip.tripPlan?.budget || null;
+              const startDate = tripSummary.start_date || trip.tripPlan?.start_date || null;
+              const origin = tripSummary.origin || trip.tripPlan?.origin || null;
+              
+              return (
+                <div key={trip.id} className="trip-card">
+                  <div className="trip-info">
+                    <h3>{destination}</h3>
+                    <p className="trip-details">
+                      {duration ? `${duration} days` : 'Duration not specified'}
+                      {budget && ` • Budget: ৳${budget.toLocaleString()}`}
+                    </p>
+                    <p className="trip-dates">
+                      Accepted: {new Date(trip.createdAt).toLocaleDateString()}
+                      {startDate && ` • Start: ${startDate}`}
+                    </p>
+                    {origin && (
+                      <p className="trip-transport">
+                        From: {origin} → To: {destination}
+                      </p>
+                    )}
                 </div>
                 <div className="trip-actions">
-                  <button className="btn-outline">View Details</button>
+                  <button 
+                    className="btn-outline"
+                    onClick={() => {
+                      // Navigate to trip details or show modal
+                      console.log('View trip details:', trip);
+                      alert('Trip details view coming soon!');
+                    }}
+                  >
+                    View Details
+                  </button>
+                  <button 
+                    className="btn-danger"
+                    onClick={async () => {
+                      if (window.confirm('Are you sure you want to delete this trip?')) {
+                        try {
+                          await tripApi.deleteAcceptedTrip(trip.id);
+                          setTrips(trips.filter(t => t.id !== trip.id));
+                        } catch (error) {
+                          console.error('Error deleting trip:', error);
+                          alert('Failed to delete trip. Please try again.');
+                        }
+                      }
+                    }}
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="empty-state">
-            <p>You haven't created any trips yet.</p>
-            <button onClick={handleCreateTrip} className="btn-primary">Create Your First Trip</button>
+            <p>You haven't accepted any trips yet.</p>
+            <button onClick={() => navigate('/travel-planner')} className="btn-primary">
+              Plan Your First Trip
+            </button>
           </div>
         )}
       </div>

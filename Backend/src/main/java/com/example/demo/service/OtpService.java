@@ -39,11 +39,11 @@ public class OtpService {
     @Transactional
     public void initiateRegistration(RegisterRequest registerRequest) {
         // Check if user already exists
-        if (userRepository.findByUsername(registerRequest.getUsername()) != null) {
+        if (userRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
             throw new RuntimeException("Error: Username is already taken!");
         }
 
-        if (userRepository.findByEmail(registerRequest.getEmail()) != null) {
+        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
             throw new RuntimeException("Error: Email is already in use!");
         }
 

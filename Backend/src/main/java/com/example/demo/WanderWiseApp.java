@@ -20,6 +20,7 @@ public class WanderWiseApp implements CommandLineRunner {
 
     @Override
     public void run(String... arg) throws Exception {
-        storageService.init();
+        // FileStorageService initialization is handled in the constructor
+        // No need to call init() method
     }
 }

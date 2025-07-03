@@ -2,8 +2,7 @@ import axios from 'axios';
 
 // Create a dedicated Axios instance
 const api = axios.create({
-    // You can set your base URL here if you want
-    // baseURL: 'http://localhost:8080' 
+    baseURL: 'http://localhost:8080'
 });
 
 // ---- Request Interceptor ----
@@ -55,5 +54,76 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
+// API Functions for Trip Management
+export const tripApi = {
+    // Accept a trip plan
+    acceptTrip: async (tripPlan) => {
+        try {
+            const response = await api.post('/api/trip/accept', {
+                tripPlan: tripPlan
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error accepting trip:', error);
+            throw error;
+        }
+    },
+
+    // Get all accepted trips for current user
+    getMyAcceptedTrips: async () => {
+        try {
+            const response = await api.get('/api/accepted-trips/my-trips');
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching my trips:', error);
+            throw error;
+        }
+    },
+
+    // Get a specific accepted trip by ID
+    getAcceptedTripById: async (tripId) => {
+        try {
+            const response = await api.get(`/api/accepted-trips/${tripId}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching trip:', error);
+            throw error;
+        }
+    },
+
+    // Get recent accepted trips
+    getRecentAcceptedTrips: async () => {
+        try {
+            const response = await api.get('/api/accepted-trips/recent');
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching recent trips:', error);
+            throw error;
+        }
+    },
+
+    // Get trip statistics
+    getTripStats: async () => {
+        try {
+            const response = await api.get('/api/accepted-trips/stats');
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching trip stats:', error);
+            throw error;
+        }
+    },
+
+    // Delete an accepted trip
+    deleteAcceptedTrip: async (tripId) => {
+        try {
+            const response = await api.delete(`/api/accepted-trips/${tripId}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error deleting trip:', error);
+            throw error;
+        }
+    }
+};
 
 export default api;

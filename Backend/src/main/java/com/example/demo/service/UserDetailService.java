@@ -22,13 +22,13 @@ public UserDetails loadUserByUsername(String login) throws UsernameNotFoundExcep
 
     if (pattern.matcher(login).matches()) {
         // If the login string is an email, search by email
-        user = userRepository.findByEmail(login);
+        user = userRepository.findByEmail(login).orElse(null);
         if (user == null) {
             throw new UsernameNotFoundException("User not found with email: " + login);
         }
     } else {
         // Otherwise, search by username
-        user = userRepository.findByUsername(login);
+        user = userRepository.findByUsername(login).orElse(null);
         if (user == null) {
             throw new UsernameNotFoundException("User not found with username: " + login);
         }
