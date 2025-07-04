@@ -70,6 +70,20 @@ export const tripApi = {
         }
     },
 
+    // Customize an existing trip plan
+    customizeTrip: async (originalPlan, userPrompt) => {
+        try {
+            const response = await api.post('/api/trip/customize', {
+                originalPlan: originalPlan,
+                userPrompt: userPrompt
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error customizing trip:', error);
+            throw error;
+        }
+    },
+
     // Get all accepted trips for current user
     getMyAcceptedTrips: async () => {
         try {
@@ -77,6 +91,17 @@ export const tripApi = {
             return response.data;
         } catch (error) {
             console.error('Error fetching my trips:', error);
+            throw error;
+        }
+    },
+
+    // Get categorized trips (ongoing, past, upcoming)
+    getCategorizedTrips: async () => {
+        try {
+            const response = await api.get('/api/accepted-trips/categorized');
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching categorized trips:', error);
             throw error;
         }
     },

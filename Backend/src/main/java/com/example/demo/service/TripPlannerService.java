@@ -247,4 +247,79 @@ public class TripPlannerService {
         finalResponse.put("user_email", userEmail);
         
         return finalResponse;    }
+
+    /**
+     * Customize an existing trip plan based on user's modification request
+     */
+    public Map<String, Object> customizeTrip(Map<String, Object> originalPlan, String userPrompt, String userEmail) {
+        try {
+            System.out.println("🔄 CUSTOMIZING TRIP FOR USER: " + userEmail);
+            System.out.println("User Request: " + userPrompt);
+            
+            // 1. Prepare simplified request for Python service (no city_data or user_data needed)
+            Map<String, Object> customizeRequest = new HashMap<>();
+            customizeRequest.put("original_plan", originalPlan);
+            customizeRequest.put("user_prompt", userPrompt);
+            
+            // 2. Call Python service for customization
+            Map<String, Object> response = callPythonCustomizeService(customizeRequest);
+            
+            // 3. Process and return response
+            Map<String, Object> finalResponse = new HashMap<>(response);
+            finalResponse.put("customized_by", "spring-boot-gateway");
+            finalResponse.put("user_email", userEmail);
+            
+            return finalResponse;
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error in customizeTrip: " + e.getMessage());
+            throw new RuntimeException("Failed to customize trip: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Call Python travel service for trip customization
+     */
+    private Map<String, Object> callPythonCustomizeService(Map<String, Object> request) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
+            
+            String url = pythonServiceUrl + "/customize-trip";
+            System.out.println("🌐 CALLING PYTHON CUSTOMIZE SERVICE: " + url);
+            
+            ResponseEntity<Map> response = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                entity,
+                Map.class
+            );
+            
+            Map<String, Object> responseBody = response.getBody();
+            System.out.println("✅ PYTHON CUSTOMIZE SERVICE RESPONSE:");
+            System.out.println("   Status Code: " + response.getStatusCode());
+            if (responseBody != null) {
+                System.out.println("   Response Keys: " + responseBody.keySet());
+                System.out.println("   Success: " + responseBody.getOrDefault("success", "unknown"));
+                if (responseBody.get("customized_plan") != null) {
+                    System.out.println("   Customized Plan Generated: YES");
+                } else {
+                    System.out.println("   Customized Plan Generated: NO");
+                }
+                if (responseBody.get("error") != null) {
+                    System.out.println("   Error: " + responseBody.get("error"));
+                }
+            } else {
+                System.out.println("   Response Body: NULL");
+            }
+            
+            return responseBody;
+            
+        } catch (Exception e) {
+            System.err.println("❌ PYTHON CUSTOMIZE SERVICE ERROR: " + e.getMessage());
+            throw new RuntimeException("Failed to communicate with Python customize service: " + e.getMessage(), e);
+        }
+    }
 }

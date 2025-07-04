@@ -99,4 +99,43 @@ public class TripPlannerController {
     public ResponseEntity<?> saveTripPlan(@RequestBody Map<String, Object> request, Authentication authentication) {
         return acceptTripPlan(request, authentication);
     }
+
+    /**
+     * Customize an existing trip plan based on user's modification request
+     */
+    @PostMapping("/customize")
+    public ResponseEntity<?> customizeTrip(@RequestBody Map<String, Object> request, Authentication authentication) {
+        try {
+            String userEmail = authentication.getName();
+            
+            // Extract original trip plan and user prompt from request
+            Map<String, Object> originalPlan = (Map<String, Object>) request.get("originalPlan");
+            String userPrompt = (String) request.get("userPrompt");
+            Long tripId = request.get("tripId") != null ? Long.valueOf(request.get("tripId").toString()) : null;
+            
+            if (originalPlan == null || userPrompt == null || userPrompt.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "error", "Original trip plan and modification request are required"
+                ));
+            }
+
+            System.out.println("🔄 CUSTOMIZING TRIP:");
+            System.out.println("User: " + userEmail);
+            System.out.println("Trip ID: " + tripId);
+            System.out.println("User Prompt: " + userPrompt);
+            
+            // Call the service to handle trip customization
+            Map<String, Object> customizedPlan = tripPlannerService.customizeTrip(originalPlan, userPrompt, userEmail);
+            
+            return ResponseEntity.ok(customizedPlan);
+        } catch (Exception e) {
+            System.err.println("❌ Error customizing trip: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "error", e.getMessage()
+            ));
+        }
+    }
 }

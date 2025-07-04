@@ -14,7 +14,7 @@ sys.path.append(os.path.dirname(__file__))
 
 try:
     from weather_agent import get_weather
-    from smart_travel_planner import generate_trip_plan
+    from smart_travel_planner import generate_trip_plan, customize_trip_plan
 except ImportError as e:
     print(f"Import error: {e}")
     print("Make sure all agent files are in the travel-service directory")
@@ -220,98 +220,251 @@ def serve_trip_image(filename):
     except FileNotFoundError:
         return jsonify({"error": "Image not found"}), 404
 
+@app.route('/customize-trip', methods=['POST'])
+def customize_trip():
+    """
+    Customize an existing trip plan based on user's modification request
+    
+    Expected JSON payload:
+    {
+        "original_plan": {...},  # The original trip plan JSON
+        "user_prompt": "..."     # User's customization request
+    }
+    """
+    try:
+        data = request.get_json()
+        
+        # Debug: Print incoming request data
+        print("🔄 CUSTOMIZE TRIP REQUEST:")
+        print("=" * 50)
+        print(f"User Prompt: {data.get('user_prompt')}")
+        print(f"Original Plan Available: {data.get('original_plan') is not None}")
+        print(f"City Data Available: {data.get('city_data') is not None}")
+        print("=" * 50)
+        
+        # Validate required fields
+        if not data or not data.get('original_plan') or not data.get('user_prompt'):
+            return jsonify({
+                "success": False,
+                "error": "Original plan and user prompt are required"
+            }), 400
+        
+        original_plan = data.get('original_plan')
+        user_prompt = data.get('user_prompt')
+        
+        # Extract basic info from original plan
+        trip_summary = original_plan.get('trip_summary', {})
+        destination = trip_summary.get('destination', 'Unknown')
+        origin = trip_summary.get('origin', 'Unknown') 
+        duration_days = trip_summary.get('duration', 3)
+        budget = trip_summary.get('total_budget', 15000)
+        start_date = trip_summary.get('start_date', '2025-01-01')
+        
+        print(f"🎯 Customizing trip: {origin} → {destination}")
+        print(f"📝 User Request: {user_prompt}")
+        print(f"📋 Original Plan Keys: {list(original_plan.keys())}")
+        
+        # Generate customized plan using ONLY original plan and user prompt
+        print("🤖 Generating customized trip plan...")
+        customized_plan_response = customize_trip_plan(
+            original_plan=original_plan,
+            user_prompt=user_prompt
+        )
+        
+        # Parse the AI response
+        try:
+            # Clean the response
+            cleaned_response = customized_plan_response.strip()
+            if cleaned_response.startswith("```json"):
+                cleaned_response = cleaned_response[7:]
+            if cleaned_response.endswith("```"):
+                cleaned_response = cleaned_response[:-3]
+            cleaned_response = cleaned_response.strip()
+            
+            print(f"🧹 Cleaned Customized Response Length: {len(cleaned_response)} characters")
+            
+            customized_plan = json.loads(cleaned_response)
+            print(f"✅ Successfully parsed customized JSON with keys: {list(customized_plan.keys())}")
+            
+            # Check if this is an error response from the AI service
+            if 'error' in customized_plan:
+                print(f"❌ AI Service Error: {customized_plan.get('error')}")
+                print(f"❌ Error Type: {customized_plan.get('error_type', 'Unknown')}")
+                print(f"❌ Error Details: {customized_plan.get('error_details', 'No details')}")
+                
+                return jsonify({
+                    "success": False,
+                    "error": customized_plan.get('error', 'Customization failed'),
+                    "error_details": customized_plan.get('error_details', 'Unknown error'),
+                    "message": customized_plan.get('message', 'Please try again')
+                }), 500
+            
+            # Enhance with proper image URLs (same as original trip planning)
+            customized_plan = enhance_trip_plan_with_images(customized_plan)
+            print(f"🖼️ Enhanced customized trip plan with images")
+            
+        except json.JSONDecodeError as e:
+            print(f"⚠️ JSON parsing failed: {str(e)}")
+            print(f"🔍 Raw response preview: {customized_plan_response[:200]}...")
+            return jsonify({
+                "success": False,
+                "error": "Failed to parse AI response",
+                "raw_response": customized_plan_response[:500] + "..." if len(customized_plan_response) > 500 else customized_plan_response,
+                "message": "AI service returned invalid response format"
+            }), 500
+        
+        # Format response - SAME STRUCTURE as /plan-trip endpoint
+        response = {
+            "success": True,
+            "destination": destination,
+            "origin": origin,
+            "duration_days": duration_days,
+            "start_date": start_date,
+            "budget": budget,
+            "trip_plan": customized_plan,  # This is the key field frontend expects
+            "customization": {
+                "user_prompt": user_prompt,
+                "customized": True,
+                "original_plan_provided": True
+            },
+            "data_summary": {
+                "customized_from": "original_plan",
+                "original_plan_provided": True,
+                "user_prompt_length": len(user_prompt),
+                "processed_by": "python-travel-service-customizer"
+            }
+        }
+        
+        # 🖨️ DEBUG: Print what's being sent to frontend
+        print("\n" + "="*80)
+        print("📤 SENDING CUSTOMIZED TRIP TO FRONTEND:")
+        print("="*80)
+        print(f"✅ Success: {response['success']}")
+        print(f"📍 Destination: {response['destination']}")
+        print(f"🔄 Customization Prompt: {user_prompt}")
+        print(f"💰 Budget: ৳{response['budget']}")
+        
+        if response['trip_plan']:
+            print(f"📋 Customized Trip Plan Keys: {list(response['trip_plan'].keys())}")
+            if 'daily_itinerary' in response['trip_plan']:
+                itinerary = response['trip_plan']['daily_itinerary']
+                print(f"📆 Days in Customized Itinerary: {len(itinerary)}")
+        
+        print("="*80)
+        print("🚀 Customized response sent to frontend successfully!")
+        print("="*80)
+        
+        return jsonify(response)
+        
+    except Exception as e:
+        print(f"❌ Error customizing trip: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "message": "Failed to customize trip"
+        }), 500
+
 def enhance_trip_plan_with_images(trip_plan):
     """
     Enhance the trip plan by adding proper image URLs for all locations
+    Extract filename from AI response URLs and serve from local trip-images folder
     """
     if not isinstance(trip_plan, dict) or 'daily_itinerary' not in trip_plan:
         return trip_plan
     
-    # Image mapping
-    image_map = {
-        # Spots (case-insensitive matching)
-        "jaflong": "/trip-images/jaflong.jpg",
-        "jaflong tea garden": "/trip-images/jaflong_view.jpg",
-        "ratargul": "/trip-images/ratargul.jpg", 
-        "ratargul swamp forest": "/trip-images/ratargul.jpg",
-        "lalakhal": "/trip-images/lalakhal.jpg",
-        "sajek valley": "/trip-images/sajek_valley.jpg",
-        "kaptai lake": "/trip-images/kaptai_lake.jpg",
-        "hanging bridge": "/trip-images/hanging_bridge.jpg",
-        "rajban vihara": "/trip-images/rajban_vihara.jpg",
-        "shahjalal mazar": "/trip-images/shahjalal_dargah.jpg",
-        "shahjalal dargah": "/trip-images/shahjalal_dargah.jpg",
+    def extract_filename_from_url(url_or_name, default_type="spot"):
+        """
+        Extract filename from AI response URL or use the name directly
+        Examples: 
+        - https://cdn.example.com/images/parjatan_rangamati.jpg -> parjatan_rangamati.jpg
+        - "Jaflong Tea Garden" -> jaflong_tea_garden.jpg (fallback)
+        """
+        if not url_or_name:
+            # Return None instead of default - let frontend handle text fallback
+            return None
         
-        # Hotels
-        "hotel metro": "/trip-images/hotel_metro.jpg",
-        "metro international": "/trip-images/hotel_metro.jpg",
-        "garden inn": "/trip-images/garden_inn.jpg",
-        "sajek resort": "/trip-images/sajek_resort.jpg",
-        "lalakhal resort": "/trip-images/lalakhal_resort.jpg",
-        "paharika inn": "/trip-images/paharika_inn.jpg",
-        "swamp view": "/trip-images/hotel_swamp_view.jpg",
-        "lake view": "/trip-images/lake_view_rangamati.jpg",
+        # If it's already a URL, extract the filename
+        if url_or_name.startswith('http'):
+            try:
+                filename = url_or_name.split('/')[-1]
+                
+                # Clean up the filename - remove any prefixes like 'trip_images'
+                if filename.startswith('trip_images'):
+                    filename = filename.replace('trip_images', '', 1)
+                
+                # Ensure it has an extension
+                if '.' not in filename:
+                    filename += '.jpg'
+                    
+                # Ensure filename doesn't start with underscore
+                filename = filename.lstrip('_')
+                
+                return "/trip-images/" + filename
+            except:
+                return None
         
-        # Restaurants
-        "tribal": "/trip-images/tribal_food.jpg",
-        "valley cafe": "/trip-images/valley_cafe.jpg",
-        "woondal": "/trip-images/woondal.jpg",
-        "blue water": "/trip-images/blue_water.jpg",
-        "star pacific": "/trip-images/star_pacific.jpg",
-        "vihara view": "/trip-images/vihara_view.jpg",
-        "kutum bari": "/trip-images/kutum_bari.jpg"
-    }
-    
-    def get_image_for_name(name, default_type="spot"):
-        if not name:
-            return "/trip-images/sajek_valley.jpg"
+        # If it's already a processed URL path, just return it
+        if url_or_name.startswith('/trip-images/'):
+            return url_or_name
+        
+        # If it's just a name, create a filename
+        # Convert to lowercase, replace spaces with underscores
+        filename = url_or_name.lower().replace(' ', '_').replace('-', '_')
+        filename = ''.join(c for c in filename if c.isalnum() or c in ['_', '.'])
+        
+        # Add .jpg extension if not present
+        if not filename.endswith(('.jpg', '.jpeg', '.png', '.webp')):
+            filename += '.jpg'
             
-        name_lower = name.lower()
-        
-        # Try exact match first
-        for key, url in image_map.items():
-            if key in name_lower or name_lower in key:
-                return url
-        
-        # Default images by type
-        defaults = {
-            "spot": "/trip-images/sajek_valley.jpg",
-            "hotel": "/trip-images/garden_inn.jpg", 
-            "restaurant": "/trip-images/valley_cafe.jpg"
-        }
-        return defaults.get(default_type, "/trip-images/sajek_valley.jpg")
+        return "/trip-images/" + filename
     
     # Enhance each day's itinerary
     for day in trip_plan.get('daily_itinerary', []):
         # Morning activity
         if 'morning_activity' in day:
             activity = day['morning_activity']
-            if 'spot_name' in activity and not activity.get('image_url'):
-                activity['image_url'] = get_image_for_name(activity['spot_name'], 'spot')
+            if 'spot_name' in activity:
+                # Check if image_url exists from AI response, otherwise generate from name
+                if activity.get('image_url'):
+                    activity['image_url'] = extract_filename_from_url(activity['image_url'], 'spot')
+                else:
+                    activity['image_url'] = extract_filename_from_url(activity['spot_name'], 'spot')
         
         # Afternoon activities
         if 'afternoon_activities' in day:
             for activity in day['afternoon_activities']:
-                if 'spot_name' in activity and not activity.get('image_url'):
-                    activity['image_url'] = get_image_for_name(activity['spot_name'], 'spot')
+                if 'spot_name' in activity:
+                    if activity.get('image_url'):
+                        activity['image_url'] = extract_filename_from_url(activity['image_url'], 'spot')
+                    else:
+                        activity['image_url'] = extract_filename_from_url(activity['spot_name'], 'spot')
         
         # Lunch options
         if 'lunch_options' in day:
             for restaurant in day['lunch_options']:
-                if 'restaurant_name' in restaurant and not restaurant.get('image_url'):
-                    restaurant['image_url'] = get_image_for_name(restaurant['restaurant_name'], 'restaurant')
+                if 'restaurant_name' in restaurant:
+                    if restaurant.get('image_url'):
+                        restaurant['image_url'] = extract_filename_from_url(restaurant['image_url'], 'restaurant')
+                    else:
+                        restaurant['image_url'] = extract_filename_from_url(restaurant['restaurant_name'], 'restaurant')
         
         # Dinner options  
         if 'dinner_options' in day:
             for restaurant in day['dinner_options']:
-                if 'restaurant_name' in restaurant and not restaurant.get('image_url'):
-                    restaurant['image_url'] = get_image_for_name(restaurant['restaurant_name'], 'restaurant')
+                if 'restaurant_name' in restaurant:
+                    if restaurant.get('image_url'):
+                        restaurant['image_url'] = extract_filename_from_url(restaurant['image_url'], 'restaurant')
+                    else:
+                        restaurant['image_url'] = extract_filename_from_url(restaurant['restaurant_name'], 'restaurant')
         
         # Accommodation options
         if 'accommodation_options' in day:
             for hotel in day['accommodation_options']:
-                if 'hotel_name' in hotel and not hotel.get('image_url'):
-                    hotel['image_url'] = get_image_for_name(hotel['hotel_name'], 'hotel')
+                if 'hotel_name' in hotel:
+                    if hotel.get('image_url'):
+                        hotel['image_url'] = extract_filename_from_url(hotel['image_url'], 'hotel')
+                    else:
+                        hotel['image_url'] = extract_filename_from_url(hotel['hotel_name'], 'hotel')
     
     return trip_plan
 

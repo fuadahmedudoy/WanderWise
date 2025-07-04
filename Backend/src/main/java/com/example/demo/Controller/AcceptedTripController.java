@@ -29,7 +29,7 @@ public class AcceptedTripController {
     @PostMapping("/accept")
     public ResponseEntity<?> acceptTrip(@RequestBody Map<String, Object> request, Authentication authentication) {
         try {
-            String userEmail = authentication.getName();
+            String userIdentifier = authentication.getName();
             
             // Extract trip plan from request
             Map<String, Object> tripPlan = (Map<String, Object>) request.get("tripPlan");
@@ -41,7 +41,7 @@ public class AcceptedTripController {
             }
 
             // Accept and save the trip
-            AcceptedTrip acceptedTrip = acceptedTripService.acceptTrip(userEmail, tripPlan);
+            AcceptedTrip acceptedTrip = acceptedTripService.acceptTrip(userIdentifier, tripPlan);
             
             return ResponseEntity.ok(Map.of(
                 "success", true,
@@ -65,8 +65,8 @@ public class AcceptedTripController {
     @GetMapping("/my-trips")
     public ResponseEntity<?> getMyAcceptedTrips(Authentication authentication) {
         try {
-            String userEmail = authentication.getName();
-            List<AcceptedTrip> trips = acceptedTripService.getUserAcceptedTrips(userEmail);
+            String userIdentifier = authentication.getName();
+            List<AcceptedTrip> trips = acceptedTripService.getUserAcceptedTrips(userIdentifier);
             
             // Convert trip plans from JSON strings to objects
             List<Map<String, Object>> tripsWithParsedPlans = trips.stream()
@@ -223,8 +223,10 @@ public class AcceptedTripController {
     @DeleteMapping("/{tripId}")
     public ResponseEntity<?> deleteAcceptedTrip(@PathVariable Long tripId, Authentication authentication) {
         try {
-            String userEmail = authentication.getName();
-            boolean deleted = acceptedTripService.deleteAcceptedTrip(tripId, userEmail);
+            String userIdentifier = authentication.getName();
+            System.out.println("🔍 DEBUG: Delete request for trip " + tripId + " by user: " + userIdentifier);
+            
+            boolean deleted = acceptedTripService.deleteAcceptedTrip(tripId, userIdentifier);
             
             if (deleted) {
                 return ResponseEntity.ok(Map.of(
@@ -237,6 +239,29 @@ public class AcceptedTripController {
             
         } catch (Exception e) {
             System.err.println("❌ Error deleting trip: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "error", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * Get categorized trips for the authenticated user (ongoing, past, upcoming)
+     */
+    @GetMapping("/categorized")
+    public ResponseEntity<?> getCategorizedTrips(Authentication authentication) {
+        try {
+            String userIdentifier = authentication.getName();
+            Map<String, List<Map<String, Object>>> categorizedTrips = acceptedTripService.getCategorizedTrips(userIdentifier);
+            
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "categorizedTrips", categorizedTrips
+            ));
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error fetching categorized trips: " + e.getMessage());
             return ResponseEntity.badRequest().body(Map.of(
                 "success", false,
                 "error", e.getMessage()

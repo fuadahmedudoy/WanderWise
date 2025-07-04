@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -172,27 +173,172 @@ public class AcceptedTripService {
     /**
      * Delete an accepted trip
      */
-    public boolean deleteAcceptedTrip(Long tripId, String userEmail) {
+    public boolean deleteAcceptedTrip(Long tripId, String userIdentifier) {
         try {
+            System.out.println("🔍 DEBUG: Attempting to delete trip " + tripId + " for user: " + userIdentifier);
+            
             Optional<AcceptedTrip> tripOptional = acceptedTripRepository.findById(tripId);
             if (!tripOptional.isPresent()) {
+                System.out.println("❌ Trip not found with ID: " + tripId);
                 return false;
             }
 
             AcceptedTrip trip = tripOptional.get();
+            System.out.println("🔍 DEBUG: Found trip with user ID: " + trip.getUserId());
+            
+            // Find user by username first, then by email if not found (consistent with other methods)
+            Optional<User> userOptional = userRepository.findByUsername(userIdentifier);
+            if (!userOptional.isPresent()) {
+                userOptional = userRepository.findByEmail(userIdentifier);
+            }
+            
+            if (!userOptional.isPresent()) {
+                System.out.println("❌ User not found with identifier: " + userIdentifier);
+                throw new RuntimeException("User not found with identifier: " + userIdentifier);
+            }
+            
+            User user = userOptional.get();
+            System.out.println("🔍 DEBUG: Found user with ID: " + user.getId());
+            System.out.println("🔍 DEBUG: User email: " + user.getEmail());
+            System.out.println("🔍 DEBUG: User username: " + user.getUsername());
             
             // Verify the trip belongs to the user
-            Optional<User> userOptional = userRepository.findByEmail(userEmail);
-            if (!userOptional.isPresent() || !trip.getUserId().equals(userOptional.get().getId())) {
+            if (!trip.getUserId().equals(user.getId())) {
+                System.out.println("❌ Authorization failed: Trip user ID (" + trip.getUserId() + ") != Current user ID (" + user.getId() + ")");
                 throw new RuntimeException("Unauthorized to delete this trip");
             }
 
+            System.out.println("✅ Authorization successful, deleting trip...");
             acceptedTripRepository.delete(trip);
+            System.out.println("✅ Trip deleted successfully");
             return true;
             
         } catch (Exception e) {
             System.err.println("❌ Error deleting trip: " + e.getMessage());
             throw new RuntimeException("Failed to delete trip: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get trips categorized by their status (ongoing, past, upcoming)
+     */
+    public Map<String, List<Map<String, Object>>> getCategorizedTrips(String userIdentifier) {
+        try {
+            // Find user by username first, then by email if not found
+            Optional<User> userOptional = userRepository.findByUsername(userIdentifier);
+            if (!userOptional.isPresent()) {
+                userOptional = userRepository.findByEmail(userIdentifier);
+            }
+            
+            if (!userOptional.isPresent()) {
+                throw new RuntimeException("User not found with identifier: " + userIdentifier);
+            }
+
+            User user = userOptional.get();
+            List<AcceptedTrip> allTrips = acceptedTripRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
+            
+            // Initialize categories
+            List<Map<String, Object>> ongoingTrips = new ArrayList<>();
+            List<Map<String, Object>> pastTrips = new ArrayList<>();
+            List<Map<String, Object>> upcomingTrips = new ArrayList<>();
+            
+            LocalDateTime now = LocalDateTime.now();
+            
+            for (AcceptedTrip trip : allTrips) {
+                try {
+                    Map<String, Object> tripData = new HashMap<>();
+                    tripData.put("id", trip.getId());
+                    tripData.put("createdAt", trip.getCreatedAt());
+                    
+                    Map<String, Object> tripPlan = objectMapper.readValue(trip.getTripPlan(), Map.class);
+                    tripData.put("tripPlan", tripPlan);
+                    
+                    // Extract trip summary data
+                    Map<String, Object> tripSummary = null;
+                    String startDateStr = null;
+                    Integer durationDays = null;
+                    
+                    if (tripPlan.containsKey("trip_summary")) {
+                        tripSummary = (Map<String, Object>) tripPlan.get("trip_summary");
+                        if (tripSummary != null) {
+                            startDateStr = (String) tripSummary.get("start_date");
+                            durationDays = (Integer) tripSummary.get("duration");
+                        }
+                    }
+                    
+                    // If no trip summary, try to get data from root level
+                    if (startDateStr == null) {
+                        startDateStr = (String) tripPlan.get("start_date");
+                    }
+                    if (durationDays == null) {
+                        Object durationObj = tripPlan.get("duration_days");
+                        if (durationObj instanceof Integer) {
+                            durationDays = (Integer) durationObj;
+                        } else if (durationObj instanceof Number) {
+                            durationDays = ((Number) durationObj).intValue();
+                        }
+                    }
+                    
+                    // Categorize trip based on dates
+                    if (startDateStr != null && durationDays != null) {
+                        try {
+                            LocalDateTime startDate = LocalDateTime.parse(startDateStr + "T00:00:00");
+                            LocalDateTime endDate = startDate.plusDays(durationDays);
+                            
+                            if (now.isBefore(startDate)) {
+                                // Trip hasn't started yet - upcoming
+                                upcomingTrips.add(tripData);
+                            } else if (now.isAfter(endDate)) {
+                                // Trip has ended - past
+                                pastTrips.add(tripData);
+                            } else {
+                                // Trip is currently active - ongoing
+                                ongoingTrips.add(tripData);
+                            }
+                        } catch (Exception dateParseError) {
+                            System.err.println("❌ Error parsing trip dates: " + dateParseError.getMessage());
+                            // If we can't parse dates, categorize based on creation date (older than 7 days = past)
+                            if (trip.getCreatedAt().isBefore(now.minusDays(7))) {
+                                pastTrips.add(tripData);
+                            } else {
+                                upcomingTrips.add(tripData);
+                            }
+                        }
+                    } else {
+                        // If no date information available, categorize based on creation date
+                        if (trip.getCreatedAt().isBefore(now.minusDays(7))) {
+                            pastTrips.add(tripData);
+                        } else {
+                            upcomingTrips.add(tripData);
+                        }
+                    }
+                    
+                } catch (Exception e) {
+                    System.err.println("❌ Error processing trip: " + e.getMessage());
+                    // Add to past trips as fallback
+                    Map<String, Object> tripData = new HashMap<>();
+                    tripData.put("id", trip.getId());
+                    tripData.put("createdAt", trip.getCreatedAt());
+                    tripData.put("tripPlan", null);
+                    tripData.put("error", "Failed to parse trip plan");
+                    pastTrips.add(tripData);
+                }
+            }
+            
+            Map<String, List<Map<String, Object>>> categorizedTrips = new HashMap<>();
+            categorizedTrips.put("ongoing", ongoingTrips);
+            categorizedTrips.put("past", pastTrips);
+            categorizedTrips.put("upcoming", upcomingTrips);
+            
+            System.out.println("✅ Categorized trips - Ongoing: " + ongoingTrips.size() + 
+                             ", Past: " + pastTrips.size() + 
+                             ", Upcoming: " + upcomingTrips.size());
+            
+            return categorizedTrips;
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error categorizing trips: " + e.getMessage());
+            throw new RuntimeException("Failed to categorize trips: " + e.getMessage());
         }
     }
 }

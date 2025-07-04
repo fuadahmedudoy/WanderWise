@@ -1,7 +1,8 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
-import api from '../api';
+import api, { tripApi } from '../api';
+import TripImage from '../components/TripImage';
 import '../styles/create-trip.css';
 
 const CreateTrip = () => {
@@ -22,6 +23,11 @@ const CreateTrip = () => {
   const [tripPlan, setTripPlan] = useState(null);
   const [error, setError] = useState('');
   const [planningStage, setPlanningStage] = useState('form'); // 'form', 'result', 'customize'
+  
+  // Customize state
+  const [customizePrompt, setCustomizePrompt] = useState('');
+  const [customizing, setCustomizing] = useState(false);
+  const [showCustomizeInput, setShowCustomizeInput] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -145,8 +151,50 @@ const CreateTrip = () => {
     }
   };
 
-  const handleCustomize = () => {
-    setPlanningStage('customize');
+  const handleCustomize = async () => {
+    if (!customizePrompt.trim()) {
+      setError('Please enter your customization request');
+      return;
+    }
+
+    setCustomizing(true);
+    setError('');
+
+    try {
+      console.log('🔄 Customizing trip with prompt:', customizePrompt);
+      console.log('🔄 Original plan:', tripPlan);
+
+      const customizedResponse = await tripApi.customizeTrip(tripPlan, customizePrompt);
+      
+      console.log('✅ Customized trip response:', customizedResponse);
+
+      if (customizedResponse.success) {
+        // Update trip plan with customized version
+        setTripPlan(customizedResponse.trip_plan);
+        setCustomizePrompt(''); // Clear the prompt
+        setShowCustomizeInput(false); // Hide the input
+        console.log('🎉 Trip customized successfully!');
+      } else {
+        setError(customizedResponse.error || 'Failed to customize trip');
+        console.error('❌ Customization failed:', customizedResponse.error);
+      }
+    } catch (error) {
+      console.error('❌ Error customizing trip:', error);
+      setError(error.response?.data?.error || 'Failed to customize trip. Please try again.');
+    } finally {
+      setCustomizing(false);
+    }
+  };
+
+  const handleShowCustomizeInput = () => {
+    setShowCustomizeInput(true);
+    setError(''); // Clear any existing errors
+  };
+
+  const handleCancelCustomize = () => {
+    setShowCustomizeInput(false);
+    setCustomizePrompt('');
+    setError('');
   };
 
   const handleRegenerate = () => {
@@ -339,9 +387,12 @@ const CreateTrip = () => {
                                 {day.morning_activity.entry_fee > 0 && (
                                   <span className="fee">Entry: ৳{day.morning_activity.entry_fee}</span>
                                 )}
-                                {day.morning_activity.image_url && (
-                                  <img src={day.morning_activity.image_url} alt={day.morning_activity.spot_name} className="activity-image" />
-                                )}
+                                <TripImage 
+                                  src={day.morning_activity.image_url} 
+                                  alt={day.morning_activity.spot_name} 
+                                  className="activity-image"
+                                  fallbackType="spot"
+                                />
                               </div>
                             </div>
                           )}
@@ -357,9 +408,12 @@ const CreateTrip = () => {
                                     <p>{restaurant.cuisine}</p>
                                     <span className="cost">Cost: ৳{restaurant.cost_per_person}/person</span>
                                     <span className="rating">Rating: {restaurant.rating}/5</span>
-                                    {restaurant.image_url && (
-                                      <img src={restaurant.image_url} alt={restaurant.restaurant_name} className="activity-image" />
-                                    )}
+                                    <TripImage 
+                                      src={restaurant.image_url} 
+                                      alt={restaurant.restaurant_name} 
+                                      className="activity-image"
+                                      fallbackType="restaurant"
+                                    />
                                   </div>
                                 ))}
                               </div>
@@ -379,9 +433,12 @@ const CreateTrip = () => {
                                     {activity.entry_fee > 0 && (
                                       <span className="fee">Entry: ৳{activity.entry_fee}</span>
                                     )}
-                                    {activity.image_url && (
-                                      <img src={activity.image_url} alt={activity.spot_name} className="activity-image" />
-                                    )}
+                                    <TripImage 
+                                      src={activity.image_url} 
+                                      alt={activity.spot_name} 
+                                      className="activity-image"
+                                      fallbackType="spot"
+                                    />
                                   </div>
                                 ))}
                               </div>
@@ -399,9 +456,12 @@ const CreateTrip = () => {
                                     <p>{restaurant.cuisine}</p>
                                     <span className="cost">Cost: ৳{restaurant.cost_per_person}/person</span>
                                     <span className="rating">Rating: {restaurant.rating}/5</span>
-                                    {restaurant.image_url && (
-                                      <img src={restaurant.image_url} alt={restaurant.restaurant_name} className="activity-image" />
-                                    )}
+                                    <TripImage 
+                                      src={restaurant.image_url} 
+                                      alt={restaurant.restaurant_name} 
+                                      className="activity-image"
+                                      fallbackType="restaurant"
+                                    />
                                   </div>
                                 ))}
                               </div>
@@ -421,9 +481,12 @@ const CreateTrip = () => {
                                       <span className="cost">Cost: ৳{hotel.cost_per_night}/night</span>
                                       <span className="amenities">Amenities: {hotel.amenities}</span>
                                     </div>
-                                    {hotel.image_url && (
-                                      <img src={hotel.image_url} alt={hotel.hotel_name} className="activity-image" />
-                                    )}
+                                    <TripImage 
+                                      src={hotel.image_url} 
+                                      alt={hotel.hotel_name} 
+                                      className="activity-image"
+                                      fallbackType="hotel"
+                                    />
                                   </div>
                                 ))}
                               </div>
@@ -483,43 +546,6 @@ const CreateTrip = () => {
                   </div>
                 </div>
               )}
-
-              {/* Budget Summary */}
-              {tripPlan.budget_summary && (
-                <div className="budget-summary">
-                  <h3>Budget Summary</h3>
-                  <div className="budget-grid">
-                    <div className="budget-item">
-                      <span>Accommodation</span>
-                      <span>৳{tripPlan.budget_summary.total_accommodation}</span>
-                    </div>
-                    <div className="budget-item">
-                      <span>Meals</span>
-                      <span>৳{tripPlan.budget_summary.total_meals}</span>
-                    </div>
-                    <div className="budget-item">
-                      <span>Activities</span>
-                      <span>৳{tripPlan.budget_summary.total_activities}</span>
-                    </div>
-                    <div className="budget-item">
-                      <span>Transport</span>
-                      <span>৳{tripPlan.budget_summary.total_transport}</span>
-                    </div>
-                    <div className="budget-item">
-                      <span>Miscellaneous</span>
-                      <span>৳{tripPlan.budget_summary.total_misc}</span>
-                    </div>
-                    <div className="budget-item total">
-                      <span>Total Cost</span>
-                      <span>৳{tripPlan.budget_summary.grand_total}</span>
-                    </div>
-                    <div className="budget-item remaining">
-                      <span>Remaining Budget</span>
-                      <span>৳{tripPlan.budget_summary.remaining}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Action Buttons */}
@@ -532,7 +558,7 @@ const CreateTrip = () => {
               </button>
               <button 
                 className="action-btn customize"
-                onClick={handleCustomize}
+                onClick={handleShowCustomizeInput}
               >
                 Customize
               </button>
@@ -543,34 +569,44 @@ const CreateTrip = () => {
                 Regenerate
               </button>
             </div>
-          </div>
-        )}
 
-        {/* Customize Section */}
-        {planningStage === 'customize' && (
-          <div className="customize-section">
-            <div className="customize-header">
-              <h2>Customize Your Trip</h2>
-              <p>Modify your trip plan to better suit your preferences</p>
-            </div>
-            
-            <div className="customize-content">
-              <p>Customization features will be available soon!</p>
-              <div className="customize-actions">
-                <button 
-                  className="action-btn"
-                  onClick={() => setPlanningStage('result')}
-                >
-                  Back to Plan
-                </button>
-                <button 
-                  className="action-btn accept"
-                  onClick={handleAccept}
-                >
-                  Save Changes
-                </button>
+            {/* Inline Customize Input */}
+            {showCustomizeInput && (
+              <div className="inline-customize">
+                <div className="customize-header">
+                  <h3>✨ Customize Your Trip</h3>
+                  <p>Tell us what you'd like to change about your current plan</p>
+                </div>
+                
+                <div className="customize-input-section">
+                  <textarea
+                    value={customizePrompt}
+                    onChange={(e) => setCustomizePrompt(e.target.value)}
+                    placeholder="e.g., 'I want to visit Ratargul Swamp Forest first' or 'Change my budget to ৳20,000' or 'Add more cultural activities'"
+                    rows="3"
+                    className="customize-input"
+                    disabled={customizing}
+                  />
+                  
+                  <div className="customize-buttons">
+                    <button 
+                      className="btn-cancel"
+                      onClick={handleCancelCustomize}
+                      disabled={customizing}
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      className="btn-customize"
+                      onClick={handleCustomize}
+                      disabled={!customizePrompt.trim() || customizing}
+                    >
+                      {customizing ? '⏳ Customizing...' : '🚀 Apply Changes'}
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>

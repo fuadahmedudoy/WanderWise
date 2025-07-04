@@ -299,70 +299,156 @@ Instructions:
 
 def get_image_url(item_name, item_type="spot"):
     """
-    Map location names to image URLs from the trip-images folder
+    Extract filename from AI response URL or generate from name
+    This function now works with the dynamic approach
     
     Args:
-        item_name (str): Name of the spot, hotel, or restaurant
+        item_name (str): Name of the spot, hotel, or restaurant, or full URL
         item_type (str): Type - 'spot', 'hotel', or 'restaurant'
     
     Returns:
-        str: Image URL path
+        str: Image URL path or None if no valid image
     """
-    base_url = "/trip-images/"
+    if not item_name:
+        # Return None instead of default - let frontend handle text fallback
+        return None
     
-    # Normalize name for matching (lowercase, remove spaces/special chars)
-    normalized_name = item_name.lower().replace(" ", "_").replace("'", "").replace("-", "_")
+    # If it's already a URL, extract the filename
+    if item_name.startswith('http'):
+        try:
+            filename = item_name.split('/')[-1]
+            
+            # Clean up the filename - remove any prefixes like 'trip_images'
+            if filename.startswith('trip_images'):
+                filename = filename.replace('trip_images', '', 1)
+            
+            # Ensure it has an extension
+            if '.' not in filename:
+                filename += '.jpg'
+                
+            # Ensure filename doesn't start with underscore
+            filename = filename.lstrip('_')
+            
+            return "/trip-images/" + filename
+        except:
+            return None
     
-    # Image mapping dictionary based on available images
-    image_map = {
-        # Tourist Spots
-        "jaflong": "jaflong.jpg",
-        "jaflong_tea_garden": "jaflong_view.jpg", 
-        "hanging_bridge": "hanging_bridge.jpg",
-        "ratargul_swamp_forest": "ratargul.jpg",
-        "ratargul": "ratargul.jpg",
-        "lalakhal": "lalakhal.jpg",
-        "kaptai_lake": "kaptai_lake.jpg",
-        "sajek_valley": "sajek_valley.jpg",
-        "rajban_vihara": "rajban_vihara.jpg",
-        "shahjalal_mazar": "shahjalal_dargah.jpg",
-        "shahjalal_dargah": "shahjalal_dargah.jpg",
-        "blue_water_restaurant": "blue_water.jpg",
+    # If it's already a processed URL path, just return it
+    if item_name.startswith('/trip-images/'):
+        return item_name
+    
+    # If it's just a name, create a filename
+    # Convert to lowercase, replace spaces with underscores
+    filename = item_name.lower().replace(' ', '_').replace('-', '_')
+    filename = ''.join(c for c in filename if c.isalnum() or c in ['_', '.'])
+    
+    # Add .jpg extension if not present
+    if not filename.endswith(('.jpg', '.jpeg', '.png', '.webp')):
+        filename += '.jpg'
         
-        # Hotels
-        "hotel_metro_international": "hotel_metro.jpg",
-        "hotel_metro": "hotel_metro.jpg",
-        "swamp_view_resort": "hotel_swamp_view.jpg",
-        "garden_inn": "garden_inn.jpg",
-        "sajek_resort": "sajek_resort.jpg",
-        "lalakhal_resort": "lalakhal_resort.jpg",
-        "paharika_inn": "paharika_inn.jpg",
-        "lake_view_resort": "lake_view_rangamati.jpg",
+    return "/trip-images/" + filename
+
+def customize_trip_plan(original_plan, user_prompt):
+    """
+    Customize an existing trip plan based on user's modification request using OpenAI LLM.
+    
+    Args:
+        original_plan (dict): The original trip plan JSON containing all needed data
+        user_prompt (str): User's customization request
         
-        # Restaurants
-        "tribal_cultural_restaurant": "tribal_food.jpg",
-        "tribal_food_corner": "tribal_food.jpg",
-        "star_pacific_hotel": "star_pacific.jpg",
-        "valley_cafe": "valley_cafe.jpg",
-        "woondal_restaurant": "woondal.jpg",
-        "kutum_bari": "kutum_bari.jpg",
-        "blue_water": "blue_water.jpg",
-        "vihara_view_restaurant": "vihara_view.jpg"
-    }
+    Returns:
+        str: Customized trip plan from the LLM
+    """
     
-    # Try exact match first
-    if normalized_name in image_map:
-        return base_url + image_map[normalized_name]
-    
-    # Try partial matches for flexibility
-    for key, image in image_map.items():
-        if key in normalized_name or normalized_name in key:
-            return base_url + image
-    
-    # Default images by type
-    defaults = {
-        "spot": "sajek_valley.jpg",  # Default scenic image
-        "hotel": "garden_inn.jpg",   # Default hotel image  
-        "restaurant": "valley_cafe.jpg"  # Default restaurant image
-    }
-    return base_url + defaults.get(item_type, "sajek_valley.jpg")
+    try:
+        # Check if OpenAI API key is available
+        if not os.getenv("OPENAI_API_KEY"):
+            print("❌ OPENAI_API_KEY not found in environment variables")
+            raise Exception("OpenAI API key not configured")
+        
+        print(f"🔧 CUSTOMIZE DEBUG INFO:")
+        print(f"   Original plan type: {type(original_plan)}")
+        print(f"   Original plan keys: {list(original_plan.keys()) if isinstance(original_plan, dict) else 'Not a dict'}")
+        print(f"   User prompt: {user_prompt}")
+        print(f"   OpenAI client initialized: {client is not None}")
+        
+        # Convert original plan to string for the prompt
+        original_plan_str = json.dumps(original_plan, indent=2, ensure_ascii=False)
+        print(f"   Original plan JSON length: {len(original_plan_str)} characters")
+        
+        # Create a focused and intelligent prompt for trip customization
+        prompt = f"""You are an expert travel planner specializing in trip customization. A user has an existing complete trip plan and wants to make specific modifications to it.
+
+## Original Complete Trip Plan:
+{original_plan_str}
+
+## User's Modification Request:
+"{user_prompt}"
+
+## Your Task:
+Intelligently modify the original trip plan according to the user's request. The original plan contains all the necessary data about available spots, hotels, restaurants, weather, and budget information.
+
+## Customization Guidelines:
+
+### Core Principles:
+1. **Preserve Structure**: Keep the exact same JSON structure as the original plan
+2. **Smart Changes**: Only modify what the user specifically requested
+3. **Use Original Data**: Use spots, hotels, restaurants from the original plan's data
+4. **Budget Awareness**: Stay within the original budget constraints
+5. **Logical Consistency**: Ensure changes make practical sense
+
+### Required Output Format:
+Return a complete JSON trip plan with the EXACT same structure as the original plan.
+
+### Image URLs: 
+Use format: "/trip-images/[descriptive_name].jpg" for all activities
+
+### Key Points:
+- Maintain all required fields from original structure
+- Be creative but realistic with changes
+- Ensure modified plan is immediately usable
+- Keep explanations within activity descriptions
+- Update trip_theme and highlights if relevant
+
+Now customize the trip plan based on the user's request:
+
+Return ONLY the modified trip plan as valid JSON without any explanations or markdown formatting."""
+
+        # Call OpenAI API
+        print("🤖 Calling OpenAI API for trip customization...")
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "You are a professional travel planning assistant that modifies existing itineraries based on user requests. Always return properly formatted JSON without any markdown or explanations."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=3000,
+            temperature=0.7,
+            response_format={ "type": "json_object" }
+        )
+        
+        llm_response = response.choices[0].message.content
+        
+        # Print the LLM response for debugging
+        print("🎯 Customization LLM Response:")
+        print("=" * 80)
+        print(llm_response)
+        print("=" * 80)
+        
+        return llm_response
+        
+    except Exception as e:
+        print(f"❌ Error customizing trip plan: {str(e)}")
+        print(f"❌ Error type: {type(e).__name__}")
+        print(f"❌ Error details: {e}")
+        
+        # Return a fallback response
+        fallback_response = {
+            "error": "Failed to customize trip plan",
+            "error_type": type(e).__name__,
+            "error_details": str(e),
+            "original_plan": original_plan,
+            "user_request": user_prompt,
+            "message": "Please try again with a different request or check system configuration"
+        }
+        return json.dumps(fallback_response, indent=2)
