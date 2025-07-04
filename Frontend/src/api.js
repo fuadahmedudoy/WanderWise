@@ -60,7 +60,7 @@ export const tripApi = {
     // Accept a trip plan
     acceptTrip: async (tripPlan) => {
         try {
-            const response = await api.post('/api/trip/accept', {
+            const response = await api.post('/api/accepted-trips/accept', {
                 tripPlan: tripPlan
             });
             return response.data;

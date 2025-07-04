@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { tripApi } from '../api';
+import api from '../api';
 import '../styles/travel-planner.css';
 
 const TravelPlanner = () => {
@@ -29,16 +30,8 @@ const TravelPlanner = () => {
         e.preventDefault();
         setIsLoading(true);
         setError('');        try {
-            const response = await fetch('http://localhost:8080/api/travel/plan', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify(formData)
-            });
-
-            const data = await response.json();
+            const response = await api.post('/api/trip/plan', formData);
+            const data = response.data;
 
             if (data.success) {
                 setPlanData(data);
@@ -46,7 +39,12 @@ const TravelPlanner = () => {
                 setError(data.error || 'Failed to plan trip');
             }
         } catch (err) {
-            setError('Network error. Please try again.');
+            console.error('Error planning trip:', err);
+            if (err.response?.data?.error) {
+                setError(err.response.data.error);
+            } else {
+                setError('Network error. Please try again.');
+            }
         } finally {
             setIsLoading(false);
         }

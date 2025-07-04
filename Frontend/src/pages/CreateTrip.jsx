@@ -126,23 +126,22 @@ const CreateTrip = () => {
   const handleAccept = async () => {
     // Save trip functionality
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:8080/api/trip/accept', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ tripPlan: tripPlan })
+      const response = await api.post('/api/accepted-trips/accept', {
+        tripPlan: tripPlan
       });
 
-      if (response.ok) {
+      if (response.data.success) {
         navigate('/my-trips');
       } else {
-        setError('Failed to save trip');
+        setError(response.data.error || 'Failed to save trip');
       }
     } catch (err) {
-      setError('Error saving trip');
+      console.error('Error accepting trip:', err);
+      if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else {
+        setError('Error saving trip');
+      }
     }
   };
 
