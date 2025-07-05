@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -22,6 +23,20 @@ public interface TripPlanRepository extends JpaRepository<TripPlan, Long> {
      * Find trip plans by user ID and status
      */
     List<TripPlan> findByUserIdAndStatusOrderByCreatedAtDesc(UUID userId, TripPlan.TripStatus status);
+    
+    /**
+     * Find trip plans by status
+     */
+    List<TripPlan> findByStatus(TripPlan.TripStatus status);
+    
+    /**
+     * Find upcoming trips within a date range based on their start date
+     */
+    @Query(value = "SELECT * FROM trip_plan WHERE status = 'upcoming' AND " +
+           "(CAST(trip_plan ->> 'start_date' AS DATE) BETWEEN :startDate AND :endDate OR " +
+           "CAST(trip_plan -> 'trip_summary' ->> 'start_date' AS DATE) BETWEEN :startDate AND :endDate)", 
+           nativeQuery = true)
+    List<TripPlan> findUpcomingTripsInRange(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
     
     /**
      * Find trip plans by user ID with pagination

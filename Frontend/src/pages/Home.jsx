@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import api from '../api'; // <-- Import api
 import { FaStar } from 'react-icons/fa';
+import NotificationCenter from '../components/NotificationCenter';
 import '../styles/home.css';
 
 const Home = () => {
@@ -66,6 +67,7 @@ const Home = () => {
         <div className="logo">WanderWise</div>
         {effectiveUser ? (
           <div className="action-buttons">
+            <NotificationCenter />
             <button onClick={() => navigate('/profile')} className="btn-outline">Profile</button>
             <button onClick={handleLogout} className="btn-outline">Logout</button>
           </div>

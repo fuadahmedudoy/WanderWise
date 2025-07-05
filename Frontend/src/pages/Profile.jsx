@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import api from '../api';
+import NotificationCenter from '../components/NotificationCenter';
 import '../styles/Profile.css';
 
 const Profile = () => {
@@ -94,6 +95,7 @@ const Profile = () => {
                     WanderWise
                 </div>
                 <div className="nav-buttons">
+                    <NotificationCenter />
                     <button onClick={() => navigate('/my-trips')} className="btn-outline">My Trips</button>
                     <button onClick={handleLogout} className="btn-primary">Logout</button>
                 </div>

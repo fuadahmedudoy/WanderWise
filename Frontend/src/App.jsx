@@ -11,6 +11,7 @@ import CreateTrip from './pages/CreateTrip';
 import MyTrips from './pages/MyTrips';
 import Profile from './pages/Profile'; 
 import DestinationDetail from './pages/DestinationDetail';
+import WeatherDetails from './pages/WeatherDetails';
 import './styles/global.css';
 
 function App() {
@@ -24,6 +25,14 @@ function App() {
           <Route path="/oauth-success" element={<OAuthSuccess />} />
           <Route path="/" element={<Home />} />
           <Route path="/destination/:id" element={<DestinationDetail />} />
+          <Route 
+            path="/weather-details/:tripId" 
+            element={
+              <RequireAuth>
+                <WeatherDetails />
+              </RequireAuth>
+            } 
+          />
           <Route 
             path="/create-trip" 
             element={

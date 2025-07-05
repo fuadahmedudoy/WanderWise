@@ -25,7 +25,7 @@ public class UserProfileService {
     @Autowired
     private FileStorageService storageService;
 
-    @Value("${backend-url}")
+    @Value("${backend.url}")
     private String backendUrl;
 
     public UserProfileDTO getUserProfile(UUID userId) {

@@ -1,5 +1,7 @@
 package com.example.demo.entity;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -48,6 +51,107 @@ public class TripPlan {
         if (status == null) {
             status = TripStatus.UPCOMING;
         }
+    }
+
+    // Helper methods to extract data from JSONB
+    public String getDestination() {
+        return getStringFromJson("destination", "trip_summary.destination");
+    }
+
+    public String getOrigin() {
+        return getStringFromJson("origin", "trip_summary.origin");
+    }
+
+    public LocalDate getStartDate() {
+        try {
+            String dateStr = getStringFromJson("start_date", "trip_summary.start_date");
+            return dateStr != null ? LocalDate.parse(dateStr) : null;
+        } catch (Exception e) {
+            System.err.println("Error parsing start date: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public Integer getDurationDays() {
+        return getIntFromJson("duration_days", "trip_summary.duration");
+    }
+
+    public Double getBudget() {
+        return getDoubleFromJson("budget", "trip_summary.total_budget");
+    }
+
+    private String getStringFromJson(String... paths) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(tripPlan);
+
+            for (String path : paths) {
+                JsonNode node = getNodeByPath(jsonNode, path);
+                if (node != null && !node.isNull()) {
+                    return node.asText();
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            System.err.println("Error parsing JSON: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private Integer getIntFromJson(String... paths) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(tripPlan);
+
+            for (String path : paths) {
+                JsonNode node = getNodeByPath(jsonNode, path);
+                if (node != null && !node.isNull()) {
+                    return node.asInt();
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            System.err.println("Error parsing JSON: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private Double getDoubleFromJson(String... paths) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(tripPlan);
+
+            for (String path : paths) {
+                JsonNode node = getNodeByPath(jsonNode, path);
+                if (node != null && !node.isNull()) {
+                    return node.asDouble();
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            System.err.println("Error parsing JSON: " + e.getMessage());
+            return null;
+        }
+    }
+
+    private JsonNode getNodeByPath(JsonNode node, String path) {
+        String[] parts = path.split("\\.");
+        JsonNode current = node;
+
+        for (String part : parts) {
+            if (current == null || current.isNull()) {
+                return null;
+            }
+            current = current.get(part);
+        }
+
+        return current;
+    }
+
+    // Check if trip is upcoming
+    public boolean isUpcoming() {
+        LocalDate startDate = getStartDate();
+        return startDate != null && startDate.isAfter(LocalDate.now());
     }
 
     public enum TripStatus {

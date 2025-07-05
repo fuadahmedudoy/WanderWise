@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import { tripApi } from '../api'; // <-- Import tripApi
 import TripDetailsModal from '../components/TripDetailsModal';
+import NotificationCenter from '../components/NotificationCenter';
 import '../styles/trips.css';
 
 const MyTrips = () => {
@@ -197,7 +198,10 @@ const MyTrips = () => {
     <div className="page-container">
       <header className="page-header">
         <div className="logo">WanderWise</div>
-        <button onClick={() => navigate('/')} className="btn-outline">Back to Home</button>
+        <div className="nav-buttons">
+          <NotificationCenter />
+          <button onClick={() => navigate('/')} className="btn-outline">Back to Home</button>
+        </div>
       </header>
       
       <div className="content-container">
