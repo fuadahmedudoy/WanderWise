@@ -1,10 +1,7 @@
 name: Deploy to Production
 
 on:
-  workflow_run:
-    workflows: ["Run Tests"]
-    types:
-      - completed
+  push:
     branches:
       - main
 
@@ -12,11 +9,35 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     name: Deploy to Azure VM
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Check if tests passed
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: runs } = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'test.yml',
+              head_sha: context.sha,
+              per_page: 1
+            });
+            
+            if (runs.total_count === 0) {
+              core.setFailed('No test run found for this commit');
+              return;
+            }
+            
+            const testRun = runs.workflow_runs[0];
+            if (testRun.conclusion !== 'success') {
+              core.setFailed(`Tests failed or are still running. Status: ${testRun.conclusion || testRun.status}`);
+              return;
+            }
+            
+            console.log('✅ Tests passed successfully for this commit');
 
       - name: Validate project structure
         run: |
