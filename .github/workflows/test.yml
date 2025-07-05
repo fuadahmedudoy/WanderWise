@@ -1,0 +1,92 @@
+name: Run Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  frontend-tests:
+    runs-on: ubuntu-latest
+    name: Frontend Tests
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: Frontend
+        run: npm ci
+
+      - name: Run frontend tests with coverage
+        working-directory: Frontend
+        run: npm run test:ci
+        env:
+          CI: true
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-coverage
+          path: Frontend/coverage/
+          retention-days: 30
+
+  # Future: Add backend tests here
+  # backend-tests:
+  #   runs-on: ubuntu-latest
+  #   name: Backend Tests
+  #   
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
+  #
+  #     - name: Set up Java
+  #       uses: actions/setup-java@v3
+  #       with:
+  #         java-version: '17'
+  #         distribution: 'temurin'
+  #
+  #     - name: Run backend tests
+  #       working-directory: Backend
+  #       run: mvn test
+
+  test-summary:
+    runs-on: ubuntu-latest
+    name: Test Summary
+    needs: [frontend-tests]
+    if: always()
+    
+    steps:
+      - name: Test Results Summary
+        run: |
+          echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.frontend-tests.result }}" == "success" ]; then
+            echo "| Frontend Tests | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Frontend Tests | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Future: Add backend test status
+          # if [ "${{ needs.backend-tests.result }}" == "success" ]; then
+          #   echo "| Backend Tests | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          # else
+          #   echo "| Backend Tests | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          # fi
+
+      - name: Fail if any tests failed
+        if: needs.frontend-tests.result != 'success'
+        run: exit 1

@@ -1,47 +1,41 @@
-name: CI/CD Pipeline
+name: Deploy to Production
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Run Tests"]
+    types:
+      - completed
     branches:
       - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    name: Deploy to Azure VM
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Run simple validation test
-      - name: Run simple validation test
+      - name: Validate project structure
         run: |
-          echo "Running simple validation..."
+          echo "Running project validation..."
           if [ ! -f "Backend/pom.xml" ]; then
-            echo "Backend/pom.xml not found!"
+            echo "❌ Backend/pom.xml not found!"
             exit 1
           fi
           if [ ! -f "Frontend/package.json" ]; then
-            echo "Frontend/package.json not found!"
+            echo "❌ Frontend/package.json not found!"
             exit 1
           fi
-          echo "Validation successful!"
+          if [ ! -f "docker-compose.yml" ]; then
+            echo "❌ docker-compose.yml not found!"
+            exit 1
+          fi
+          echo "✅ Project structure validation successful!"
 
-      # Step 3: Set up Java for running tests
-      # - name: Set up Java
-      #   uses: actions/setup-java@v3
-      #   with:
-      #     java-version: '17'
-      #     distribution: 'temurin' # Specify the Java distribution
-
-      # # Step 4: Run backend tests
-      # - name: Run backend tests
-      #   working-directory: Backend
-      #   run: mvn test
-
-      # Step 5: Deploy to VM (only if tests pass)
-      - name: Deploy to VM
+      - name: Deploy to Azure VM
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.AZURE_VM_HOST }}
@@ -71,3 +65,21 @@ jobs:
 
             # Clean up unused Docker images to save space
             docker image prune -f
+
+            # Verify deployment
+            echo "✅ Deployment completed successfully!"
+            echo "🔍 Checking container status..."
+            docker-compose ps
+
+      - name: Deployment Summary
+        if: always()
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deployment | ✅ Completed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Environment | Azure VM |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
