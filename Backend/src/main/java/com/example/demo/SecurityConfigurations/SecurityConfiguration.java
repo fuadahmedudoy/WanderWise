@@ -74,13 +74,14 @@ public class SecurityConfiguration {
         return security
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/login", "/api/register", "/api/signup", "/api/ping",
                                 "/login/oauth2/code/**", "/oauth2/**", "/oauth2/authorization/**",
                                 "/api/verify-otp", "/api/resend-otp", "/api/cleanup-pending",
                                 "/api/destinations/featured", "/api/destinations/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         //.loginPage("/api/login")

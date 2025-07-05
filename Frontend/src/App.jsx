@@ -12,6 +12,7 @@ import MyTrips from './pages/MyTrips';
 import Profile from './pages/Profile'; 
 import DestinationDetail from './pages/DestinationDetail';
 import WeatherDetails from './pages/WeatherDetails';
+import AdminDashboard from './pages/AdminDashboard';
 import './styles/global.css';
 
 function App() {
@@ -58,6 +59,14 @@ function App() {
               </RequireAuth>
             } 
           />
+          <Route 
+            path="/admin" 
+            element={
+              <RequireAuth adminOnly={true}>
+                <AdminDashboard />
+              </RequireAuth>
+            } 
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
@@ -66,17 +75,16 @@ function App() {
 }
 
 // Component to handle protected routes
-function RequireAuth({ children }) {
+function RequireAuth({ children, adminOnly = false }) {
   const { currentUser } = useContext(AuthContext);
   
   console.log("🔐 RequireAuth: Checking authentication state...");
   console.log("🔐 Current user from context:", currentUser ? "✅ User present" : "❌ No user");
-  if (currentUser) {
-    console.log("👤 User details:", JSON.stringify(currentUser, null, 2));
-  }
   
-  // Check localStorage as a fallback
-  if (!currentUser) {
+  let user = currentUser;
+  
+  // Check localStorage as a fallback if no user in context
+  if (!user) {
     const savedUser = localStorage.getItem('currentUser');
     const savedToken = localStorage.getItem('token');
     
@@ -85,19 +93,23 @@ function RequireAuth({ children }) {
     console.log("💾 Saved token in localStorage:", savedToken ? "✅ Found" : "❌ Not found");
     
     if (savedUser) {
-      // User data exists in localStorage, allow access
-      console.log("✅ RequireAuth: Found user data in localStorage, allowing access");
       try {
-        const userData = JSON.parse(savedUser);
-        console.log("👤 localStorage user data:", JSON.stringify(userData, null, 2));
+        user = JSON.parse(savedUser);
+        console.log("👤 localStorage user data:", JSON.stringify(user, null, 2));
       } catch (e) {
         console.error("❌ Error parsing saved user data:", e);
+        return <Navigate to="/auth/login" replace />;
       }
-      return children;
+    } else {
+      console.log("❌ RequireAuth: No user data found, redirecting to login");
+      return <Navigate to="/auth/login" replace />;
     }
-    
-    console.log("❌ RequireAuth: No user data found, redirecting to login");
-    return <Navigate to="/auth/login" replace />;
+  }
+  
+  // Check if the route requires admin role
+  if (adminOnly && user.role !== 'ADMIN') {
+    console.log("🚫 RequireAuth: Admin route accessed by non-admin user, redirecting to home");
+    return <Navigate to="/" replace />;
   }
   
   console.log("✅ RequireAuth: User authenticated, allowing access");
