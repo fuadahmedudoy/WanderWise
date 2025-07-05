@@ -169,11 +169,12 @@ CREATE TABLE public.users (
     role character varying(255)
 );
 
-CREATE TABLE public.accepted_trips (
+CREATE TABLE public.trip_plan (
     id SERIAL PRIMARY KEY,
     user_id uuid REFERENCES users(id) ON DELETE CASCADE,
-    trip_plan jsonb NOT NULL,
-    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+    trip_plan JSONB NOT NULL,
+    status TEXT CHECK (status IN ('upcoming', 'running', 'completed')) NOT NULL DEFAULT 'upcoming',
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE travel_cities (

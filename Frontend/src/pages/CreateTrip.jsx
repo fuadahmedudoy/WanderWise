@@ -132,14 +132,12 @@ const CreateTrip = () => {
   const handleAccept = async () => {
     // Save trip functionality
     try {
-      const response = await api.post('/api/accepted-trips/accept', {
-        tripPlan: tripPlan
-      });
+      const response = await tripApi.acceptTrip(tripPlan);
 
-      if (response.data.success) {
+      if (response.success) {
         navigate('/my-trips');
       } else {
-        setError(response.data.error || 'Failed to save trip');
+        setError(response.error || 'Failed to save trip');
       }
     } catch (err) {
       console.error('Error accepting trip:', err);

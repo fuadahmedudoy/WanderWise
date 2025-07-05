@@ -10,16 +10,16 @@ const MyTrips = () => {
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const [categorizedTrips, setCategorizedTrips] = useState({
-    ongoing: [],
+    running: [],
     upcoming: [],
-    past: []
+    completed: []
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [activeTab, setActiveTab] = useState('ongoing');
+  const [activeTab, setActiveTab] = useState('running');
   
   useEffect(() => {
     const fetchTrips = async () => {
@@ -27,7 +27,7 @@ const MyTrips = () => {
         try {
           const response = await tripApi.getCategorizedTrips();
           if (response.success) {
-            setCategorizedTrips(response.categorizedTrips);
+            setCategorizedTrips(response.data);
           } else {
             setError(response.error || 'Failed to fetch trips');
           }
@@ -67,16 +67,16 @@ const MyTrips = () => {
       console.log('🗑️ Attempting to delete trip with ID:', tripId);
       console.log('🔍 Trip ID type:', typeof tripId);
       
-      const response = await tripApi.deleteAcceptedTrip(tripId);
+      const response = await tripApi.deleteTripPlan(tripId);
       console.log('📡 Delete API response:', response);
       
       // Check for successful deletion
       if (response && (response.success === true || response.message === "Trip deleted successfully")) {
         // Remove trip from all categories
         setCategorizedTrips(currentTrips => ({
-          ongoing: currentTrips.ongoing.filter(trip => trip.id !== tripId),
+          running: currentTrips.running.filter(trip => trip.id !== tripId),
           upcoming: currentTrips.upcoming.filter(trip => trip.id !== tripId),
-          past: currentTrips.past.filter(trip => trip.id !== tripId)
+          completed: currentTrips.completed.filter(trip => trip.id !== tripId)
         }));
         console.log('✅ Trip deleted successfully from database and UI');
         
@@ -99,9 +99,9 @@ const MyTrips = () => {
         alert('❌ Trip not found. It may have already been deleted.');
         // Remove from state anyway since it doesn't exist
         setCategorizedTrips(currentTrips => ({
-          ongoing: currentTrips.ongoing.filter(trip => trip.id !== tripId),
+          running: currentTrips.running.filter(trip => trip.id !== tripId),
           upcoming: currentTrips.upcoming.filter(trip => trip.id !== tripId),
-          past: currentTrips.past.filter(trip => trip.id !== tripId)
+          completed: currentTrips.completed.filter(trip => trip.id !== tripId)
         }));
       } else if (error.response?.status === 403) {
         alert('❌ You do not have permission to delete this trip.');
@@ -175,7 +175,7 @@ const MyTrips = () => {
 
   // Get total count of all trips
   const getTotalTripsCount = () => {
-    return categorizedTrips.ongoing.length + categorizedTrips.upcoming.length + categorizedTrips.past.length;
+    return categorizedTrips.running.length + categorizedTrips.upcoming.length + categorizedTrips.completed.length;
   };
 
   if (!currentUser) {
@@ -224,10 +224,10 @@ const MyTrips = () => {
             {/* Tabs for different trip categories */}
             <div className="trip-tabs">
               <button 
-                className={`tab-button ${activeTab === 'ongoing' ? 'active' : ''}`}
-                onClick={() => setActiveTab('ongoing')}
+                className={`tab-button ${activeTab === 'running' ? 'active' : ''}`}
+                onClick={() => setActiveTab('running')}
               >
-                Ongoing Tours ({categorizedTrips.ongoing.length})
+                Running Tours ({categorizedTrips.running.length})
               </button>
               <button 
                 className={`tab-button ${activeTab === 'upcoming' ? 'active' : ''}`}
@@ -236,22 +236,22 @@ const MyTrips = () => {
                 Upcoming Tours ({categorizedTrips.upcoming.length})
               </button>
               <button 
-                className={`tab-button ${activeTab === 'past' ? 'active' : ''}`}
-                onClick={() => setActiveTab('past')}
+                className={`tab-button ${activeTab === 'completed' ? 'active' : ''}`}
+                onClick={() => setActiveTab('completed')}
               >
-                Past Tours ({categorizedTrips.past.length})
+                Completed Tours ({categorizedTrips.completed.length})
               </button>
             </div>
 
             {/* Trip content based on active tab */}
             <div className="trips-list">
-              {activeTab === 'ongoing' && (
+              {activeTab === 'running' && (
                 <div className="trip-section">
-                  {categorizedTrips.ongoing.length > 0 ? (
-                    categorizedTrips.ongoing.map(trip => renderTripCard(trip))
+                  {categorizedTrips.running.length > 0 ? (
+                    categorizedTrips.running.map(trip => renderTripCard(trip))
                   ) : (
                     <div className="empty-section">
-                      <p>No ongoing tours at the moment.</p>
+                      <p>No running tours at the moment.</p>
                     </div>
                   )}
                 </div>
@@ -272,13 +272,13 @@ const MyTrips = () => {
                 </div>
               )}
 
-              {activeTab === 'past' && (
+              {activeTab === 'completed' && (
                 <div className="trip-section">
-                  {categorizedTrips.past.length > 0 ? (
-                    categorizedTrips.past.map(trip => renderTripCard(trip))
+                  {categorizedTrips.completed.length > 0 ? (
+                    categorizedTrips.completed.map(trip => renderTripCard(trip))
                   ) : (
                     <div className="empty-section">
-                      <p>No past tours found.</p>
+                      <p>No completed tours found.</p>
                     </div>
                   )}
                 </div>

@@ -58,10 +58,11 @@ api.interceptors.response.use(
 // API Functions for Trip Management
 export const tripApi = {
     // Accept a trip plan
-    acceptTrip: async (tripPlan) => {
+    acceptTrip: async (tripPlan, status = 'upcoming') => {
         try {
-            const response = await api.post('/api/accepted-trips/accept', {
-                tripPlan: tripPlan
+            const response = await api.post('/api/trip-plans/accept', {
+                tripPlan: tripPlan,
+                status: status
             });
             return response.data;
         } catch (error) {
@@ -84,21 +85,32 @@ export const tripApi = {
         }
     },
 
-    // Get all accepted trips for current user
-    getMyAcceptedTrips: async () => {
+    // Get all trip plans for current user
+    getMyTripPlans: async () => {
         try {
-            const response = await api.get('/api/accepted-trips/my-trips');
+            const response = await api.get('/api/trip-plans/my-trips');
             return response.data;
         } catch (error) {
-            console.error('Error fetching my trips:', error);
+            console.error('Error fetching my trip plans:', error);
             throw error;
         }
     },
 
-    // Get categorized trips (ongoing, past, upcoming)
+    // Get trip plans by status
+    getTripPlansByStatus: async (status) => {
+        try {
+            const response = await api.get(`/api/trip-plans/my-trips/${status}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching trip plans by status:', error);
+            throw error;
+        }
+    },
+
+    // Get categorized trips (upcoming, running, completed)
     getCategorizedTrips: async () => {
         try {
-            const response = await api.get('/api/accepted-trips/categorized');
+            const response = await api.get('/api/trip-plans/categorized');
             return response.data;
         } catch (error) {
             console.error('Error fetching categorized trips:', error);
@@ -106,13 +118,35 @@ export const tripApi = {
         }
     },
 
-    // Get a specific accepted trip by ID
-    getAcceptedTripById: async (tripId) => {
+    // Get a specific trip plan by ID
+    getTripPlanById: async (tripId) => {
         try {
-            const response = await api.get(`/api/accepted-trips/${tripId}`);
+            const response = await api.get(`/api/trip-plans/${tripId}`);
             return response.data;
         } catch (error) {
-            console.error('Error fetching trip:', error);
+            console.error('Error fetching trip plan:', error);
+            throw error;
+        }
+    },
+
+    // Update trip plan status
+    updateTripStatus: async (tripId, status) => {
+        try {
+            const response = await api.put(`/api/trip-plans/${tripId}/status`, { status });
+            return response.data;
+        } catch (error) {
+            console.error('Error updating trip status:', error);
+            throw error;
+        }
+    },
+
+    // Delete a trip plan
+    deleteTripPlan: async (tripId) => {
+        try {
+            const response = await api.delete(`/api/trip-plans/${tripId}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error deleting trip plan:', error);
             throw error;
         }
     },
@@ -139,10 +173,10 @@ export const tripApi = {
         }
     },
 
-    // Delete an accepted trip
+    // Delete an accepted trip (legacy method for backward compatibility)
     deleteAcceptedTrip: async (tripId) => {
         try {
-            const response = await api.delete(`/api/accepted-trips/${tripId}`);
+            const response = await api.delete(`/api/trip-plans/${tripId}`);
             return response.data;
         } catch (error) {
             console.error('Error deleting trip:', error);
