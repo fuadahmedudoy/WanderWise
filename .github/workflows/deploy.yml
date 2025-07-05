@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  # First run the tests
+  # Run frontend tests
   frontend-tests:
     runs-on: ubuntu-latest
     name: Frontend Tests
@@ -32,11 +32,37 @@ jobs:
         env:
           CI: true
 
-  # Then deploy only if tests pass
+  # Run backend tests
+  backend-tests:
+    runs-on: ubuntu-latest
+    name: Backend Tests
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Run backend tests
+        working-directory: Backend
+        run: ./mvnw test
+
+  # Deploy only if both frontend and backend tests pass
   deploy:
     runs-on: ubuntu-latest
     name: Deploy to Azure VM
-    needs: frontend-tests
+    needs: [frontend-tests, backend-tests]
     
     steps:
       - name: Checkout repository

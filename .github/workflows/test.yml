@@ -39,29 +39,35 @@ jobs:
           path: Frontend/coverage/
           retention-days: 30
 
-  # Future: Add backend tests here
-  # backend-tests:
-  #   runs-on: ubuntu-latest
-  #   name: Backend Tests
-  #   
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v3
-  #
-  #     - name: Set up Java
-  #       uses: actions/setup-java@v3
-  #       with:
-  #         java-version: '17'
-  #         distribution: 'temurin'
-  #
-  #     - name: Run backend tests
-  #       working-directory: Backend
-  #       run: mvn test
+  backend-tests:
+    runs-on: ubuntu-latest
+    name: Backend Tests
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Run backend tests
+        working-directory: Backend
+        run: ./mvnw test
 
   test-summary:
     runs-on: ubuntu-latest
     name: Test Summary
-    needs: [frontend-tests]
+    needs: [frontend-tests, backend-tests]
     if: always()
     
     steps:
@@ -77,13 +83,12 @@ jobs:
             echo "| Frontend Tests | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
           fi
           
-          # Future: Add backend test status
-          # if [ "${{ needs.backend-tests.result }}" == "success" ]; then
-          #   echo "| Backend Tests | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
-          # else
-          #   echo "| Backend Tests | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
-          # fi
+          if [ "${{ needs.backend-tests.result }}" == "success" ]; then
+            echo "| Backend Tests | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Backend Tests | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Fail if any tests failed
-        if: needs.frontend-tests.result != 'success'
+        if: needs.frontend-tests.result != 'success' || needs.backend-tests.result != 'success'
         run: exit 1
