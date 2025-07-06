@@ -2,6 +2,8 @@ package com.example.demo.Controller;
 
 import com.example.demo.SecurityConfigurations.JwtUtility;
 import com.example.demo.Repository.UserRepository;
+import com.example.demo.config.TestConfig;
+import com.example.demo.config.TestSecurityConfig;
 import com.example.demo.dto.LoginRequest;
 import com.example.demo.dto.RegisterRequest;
 import com.example.demo.dto.OtpVerificationRequest;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,10 +34,10 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
+// @Import({TestConfig.class, TestSecurityConfig.class})
 public class AuthControllerTest {
 
     @Autowired
