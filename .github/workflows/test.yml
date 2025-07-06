@@ -1,0 +1,98 @@
+name: Run Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  frontend-tests:
+    runs-on: ubuntu-latest
+    name: Frontend Tests
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: Frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: Frontend
+        run: npm ci
+
+      - name: Run frontend tests with coverage
+        working-directory: Frontend
+        run: npm run test:ci
+        env:
+          CI: true
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: Frontend/coverage/
+          retention-days: 30
+
+  backend-tests:
+    runs-on: ubuntu-latest
+    name: Backend Tests
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Make Maven wrapper executable
+        working-directory: Backend
+        run: chmod +x ./mvnw
+
+      - name: Run backend tests
+        working-directory: Backend
+        run: ./mvnw test
+
+  test-summary:
+    runs-on: ubuntu-latest
+    name: Test Summary
+    needs: [frontend-tests, backend-tests]
+    if: always()
+    
+    steps:
+      - name: Test Results Summary
+        run: |
+          echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.frontend-tests.result }}" == "success" ]; then
+            echo "| Frontend Tests | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Frontend Tests | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.backend-tests.result }}" == "success" ]; then
+            echo "| Backend Tests | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Backend Tests | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail if any tests failed
+        if: needs.frontend-tests.result != 'success' || needs.backend-tests.result != 'success'
+        run: exit 1

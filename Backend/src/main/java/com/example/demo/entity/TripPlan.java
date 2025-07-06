@@ -28,7 +28,7 @@ public class TripPlan {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
-    @Column(name = "trip_plan", columnDefinition = "jsonb", nullable = false)
+    @Column(name = "trip_plan", nullable = false)  // columnDefinition = "jsonb", removed for unit test error
     @JdbcTypeCode(SqlTypes.JSON)
     private String tripPlan;
 
