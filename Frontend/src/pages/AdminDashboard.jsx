@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { adminApi } from '../api';
 import AuthContext from '../context/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import '../styles/AdminDashboard.css';
 
 const AdminDashboard = () => {
   const { currentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState('dashboard');
   const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,8 +28,10 @@ const AdminDashboard = () => {
   const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
-    fetchDestinations();
-  }, []);
+    if (activeSection === 'destinations') {
+      fetchDestinations();
+    }
+  }, [activeSection]);
 
   // Check if user is admin
   if (currentUser && currentUser.role !== 'ADMIN') {
@@ -166,21 +170,46 @@ const AdminDashboard = () => {
     }, 5000);
   };
 
+  const handleNavigateHome = () => {
+    navigate('/');
+  };
+
   if (!currentUser) {
     return <div className="loading">Loading...</div>;
   }
 
   return (
     <div className="admin-dashboard">
-      <div className="admin-header">
-        <h1>Admin Dashboard</h1>
+      {/* Admin Navigation Header */}
+      <div className="admin-navigation">
+        <div className="admin-nav-left">
+          <h1>Admin Dashboard</h1>
+        </div>
+        <div className="admin-nav-right">
+          <button 
+            className="home-btn"
+            onClick={handleNavigateHome}
+          >
+            Back to Home
+          </button>
+        </div>
+      </div>
+      
+      {/* Admin Menu */}
+      <div className="admin-menu">
         <button 
-          className="add-destination-btn" 
-          onClick={() => setIsModalOpen(true)}
-          disabled={loading}
+          className={`admin-menu-item ${activeSection === 'dashboard' ? 'active' : ''}`}
+          onClick={() => setActiveSection('dashboard')}
         >
-          Add New Destination
+          Dashboard Overview
         </button>
+        <button 
+          className={`admin-menu-item ${activeSection === 'destinations' ? 'active' : ''}`}
+          onClick={() => setActiveSection('destinations')}
+        >
+          Manage Featured Destinations
+        </button>
+        {/* Add more menu items here as needed */}
       </div>
 
       {notification && (
@@ -191,68 +220,99 @@ const AdminDashboard = () => {
 
       {error && <div className="error-message">{error}</div>}
 
-      {loading ? (
-        <div className="loading">Loading...</div>
-      ) : (
-        <div className="destinations-table-container">
-          <table className="destinations-table">
-            <thead>
-              <tr>
-                <th>Image</th>
-                <th>Destination</th>
-                <th>Title</th>
-                <th>Days</th>
-                <th>Rating</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {destinations.length === 0 ? (
-                <tr>
-                  <td colSpan="7" className="no-destinations">No destinations found</td>
-                </tr>
-              ) : (
-                destinations.map(destination => (
-                  // <tr key={destination.id} className={destination.isActive ? '' : 'inactive'}>
-                  <tr key={destination.id} className={(destination.isActive ?? destination.active) ? '' : 'inactive'}>
-                    <td>
-                      <img 
-                        src={`${process.env.PUBLIC_URL}${destination.imageUrl}`} 
-                        alt={destination.title} 
-                        className="destination-thumbnail" 
-                      />
-                    </td>
-                    <td>{destination.destination}</td>
-                    <td>{destination.title}</td>
-                    <td>{destination.days}</td>
-                    <td>{destination.avgRating.toFixed(1)}</td>
-                    <td>
-                          <span className={`status-badge ${(destination.isActive ?? destination.active) ? 'active' : 'inactive'}`}>
-                              {(destination.isActive ?? destination.active) ? 'Active' : 'Inactive'}
-                          </span>
-                    </td>
-                    <td className="action-buttons">
-                      <button 
-                        className="toggle-status-btn"
-                        onClick={() => handleToggleStatus(destination.id)}
-                        title={(destination.isActive ?? destination.active) ? "Set Inactive" : "Set Active"}
-                      >
-                        {(destination.isActive ?? destination.active) ? "Deactivate" : "Activate"}
-                      </button>
-                      <button 
-                        className="delete-btn"
-                        onClick={() => handleDelete(destination.id)}
-                        title="Delete Destination"
-                      >
-                        Delete
-                      </button>
-                    </td>
+      {/* Dashboard Content Based on Selected Section */}
+      {activeSection === 'dashboard' && (
+        <div className="dashboard-overview">
+          <h2>Welcome to the Admin Dashboard</h2>
+          <p>Select an option from the menu above to manage different aspects of your website.</p>
+          
+          <div className="dashboard-stats">
+            <div className="stat-card">
+              <h3>Featured Destinations</h3>
+              <p className="stat-number">{destinations.length}</p>
+            </div>
+            {/* Add more stat cards as needed */}
+          </div>
+        </div>
+      )}
+
+      {/* Featured Destinations Management Section */}
+      {activeSection === 'destinations' && (
+        <div className="section-content">
+          <div className="section-header">
+            <h2>Manage Featured Destinations</h2>
+            <button 
+              className="add-destination-btn" 
+              onClick={() => setIsModalOpen(true)}
+              disabled={loading}
+            >
+              Add New Destination
+            </button>
+          </div>
+          
+          {loading ? (
+            <div className="loading">Loading destinations...</div>
+          ) : (
+            <div className="destinations-table-container">
+              <table className="destinations-table">
+                <thead>
+                  <tr>
+                    <th>Image</th>
+                    <th>Destination</th>
+                    <th>Title</th>
+                    <th>Days</th>
+                    <th>Rating</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  {destinations.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" className="no-destinations">No destinations found</td>
+                    </tr>
+                  ) : (
+                    destinations.map(destination => (
+                      <tr key={destination.id} className={(destination.isActive ?? destination.active) ? '' : 'inactive'}>
+                        <td>
+                          <img 
+                            src={`${process.env.PUBLIC_URL}${destination.imageUrl}`} 
+                            alt={destination.title} 
+                            className="destination-thumbnail" 
+                          />
+                        </td>
+                        <td>{destination.destination}</td>
+                        <td>{destination.title}</td>
+                        <td>{destination.days}</td>
+                        <td>{destination.avgRating.toFixed(1)}</td>
+                        <td>
+                          <span className={`status-badge ${(destination.isActive ?? destination.active) ? 'active' : 'inactive'}`}>
+                            {(destination.isActive ?? destination.active) ? 'Active' : 'Inactive'}
+                          </span>
+                        </td>
+                        <td className="action-buttons">
+                          <button 
+                            className="toggle-status-btn"
+                            onClick={() => handleToggleStatus(destination.id)}
+                            title={(destination.isActive ?? destination.active) ? "Set Inactive" : "Set Active"}
+                          >
+                            {(destination.isActive ?? destination.active) ? "Deactivate" : "Activate"}
+                          </button>
+                          <button 
+                            className="delete-btn"
+                            onClick={() => handleDelete(destination.id)}
+                            title="Delete Destination"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 
