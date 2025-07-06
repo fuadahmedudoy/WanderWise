@@ -214,7 +214,8 @@ const AdminDashboard = () => {
                 </tr>
               ) : (
                 destinations.map(destination => (
-                  <tr key={destination.id} className={destination.isActive ? '' : 'inactive'}>
+                  // <tr key={destination.id} className={destination.isActive ? '' : 'inactive'}>
+                  <tr key={destination.id} className={(destination.isActive ?? destination.active) ? '' : 'inactive'}>
                     <td>
                       <img 
                         src={`${process.env.PUBLIC_URL}${destination.imageUrl}`} 
@@ -227,17 +228,17 @@ const AdminDashboard = () => {
                     <td>{destination.days}</td>
                     <td>{destination.avgRating.toFixed(1)}</td>
                     <td>
-                      <span className={`status-badge ${destination.isActive ? 'active' : 'inactive'}`}>
-                        {destination.isActive ? 'Active' : 'Inactive'}
-                      </span>
+                          <span className={`status-badge ${(destination.isActive ?? destination.active) ? 'active' : 'inactive'}`}>
+                              {(destination.isActive ?? destination.active) ? 'Active' : 'Inactive'}
+                          </span>
                     </td>
                     <td className="action-buttons">
                       <button 
                         className="toggle-status-btn"
                         onClick={() => handleToggleStatus(destination.id)}
-                        title={destination.isActive ? "Set Inactive" : "Set Active"}
+                        title={(destination.isActive ?? destination.active) ? "Set Inactive" : "Set Active"}
                       >
-                        {destination.isActive ? "Deactivate" : "Activate"}
+                        {(destination.isActive ?? destination.active) ? "Deactivate" : "Activate"}
                       </button>
                       <button 
                         className="delete-btn"
