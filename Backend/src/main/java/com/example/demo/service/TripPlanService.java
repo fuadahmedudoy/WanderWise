@@ -63,8 +63,26 @@ public class TripPlanService {
                 tripSummary = (Map<String, Object>) tripPlan.get("trip_summary");
                 destination = (String) tripSummary.get("destination");
                 origin = (String) tripSummary.get("origin");
-                duration = (Integer) tripSummary.get("duration");
-                budget = (Integer) tripSummary.get("total_budget");
+                
+                // Handle duration - could be Integer or Double
+                Object durationObj = tripSummary.get("duration");
+                if (durationObj instanceof Integer) {
+                    duration = (Integer) durationObj;
+                } else if (durationObj instanceof Double) {
+                    duration = ((Double) durationObj).intValue();
+                } else if (durationObj instanceof Number) {
+                    duration = ((Number) durationObj).intValue();
+                }
+                
+                // Handle budget - could be Integer or Double
+                Object budgetObj = tripSummary.get("total_budget");
+                if (budgetObj instanceof Integer) {
+                    budget = (Integer) budgetObj;
+                } else if (budgetObj instanceof Double) {
+                    budget = ((Double) budgetObj).intValue();
+                } else if (budgetObj instanceof Number) {
+                    budget = ((Number) budgetObj).intValue();
+                }
             }
 
             // Log the data being saved
