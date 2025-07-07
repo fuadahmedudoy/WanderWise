@@ -80,7 +80,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/login", "/api/register", "/api/signup", "/api/ping",
                                 "/login/oauth2/code/**", "/oauth2/**", "/oauth2/authorization/**",
                                 "/api/verify-otp", "/api/resend-otp", "/api/cleanup-pending",
-                                "/api/destinations/featured", "/api/destinations/**").permitAll()
+                                "/api/destinations/featured", "/api/destinations/**","/ws/**").permitAll()
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
