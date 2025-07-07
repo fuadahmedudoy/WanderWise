@@ -61,6 +61,7 @@ services:
       FILE_UPLOAD_DIR: /app/uploads
     volumes:
       - ./uploads:/app/uploads
+      - ./Frontend/public/images:/app/Frontend/public/images
     ports:
       - "8080:8080"
     networks:
@@ -77,6 +78,7 @@ services:
       - "3000:80"
     volumes:
       - ./uploads:/usr/share/nginx/html/uploads
+      - ./Frontend/public/images:/usr/share/nginx/html/images
     networks:
       - wanderwise-network
     # environment:

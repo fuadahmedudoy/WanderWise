@@ -33,24 +33,5 @@ public class FeaturedDestinationController {
        FeaturedDestination destination = featuredDestinationService.getFeaturedDestinationById(id);
        return ResponseEntity.ok(destination);
    }
-//
-//    @PostMapping("/featured")
-//    public ResponseEntity<FeaturedDestination> createFeaturedDestination(@RequestBody FeaturedDestinationDTO dto) {
-//        FeaturedDestination destination = featuredDestinationService.createFeaturedDestination(dto);
-//        return new ResponseEntity<>(destination, HttpStatus.CREATED);
-//    }
-//
-//    @PutMapping("/featured/{id}")
-//    public ResponseEntity<FeaturedDestination> updateFeaturedDestination(
-//            @PathVariable UUID id,
-//            @RequestBody FeaturedDestinationDTO dto) {
-//        FeaturedDestination destination = featuredDestinationService.updateFeaturedDestination(id, dto);
-//        return ResponseEntity.ok(destination);
-//    }
-//
-//    @DeleteMapping("/featured/{id}")
-//    public ResponseEntity<Void> deleteFeaturedDestination(@PathVariable UUID id) {
-//        featuredDestinationService.deleteFeaturedDestination(id);
-//        return ResponseEntity.noContent().build();
-//    }
+
 }

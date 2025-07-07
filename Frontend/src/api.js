@@ -185,4 +185,66 @@ export const tripApi = {
     }
 };
 
+// API Functions for Admin Features
+export const adminApi = {
+    // Get all featured destinations (admin view)
+    getAllFeaturedDestinations: async () => {
+        try {
+            const response = await api.get('/api/admin/destinations');
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching featured destinations:', error);
+            throw error;
+        }
+    },
+
+    // Create a new featured destination
+    createFeaturedDestination: async (destinationData, imageFile) => {
+        try {
+            // Create a FormData object to handle file upload
+            const formData = new FormData();
+            
+            // Add the destination data as a JSON string
+            formData.append('destination', new Blob([JSON.stringify(destinationData)], {
+                type: 'application/json'
+            }));
+            
+            // Add the image file
+            formData.append('image', imageFile);
+            
+            const response = await api.post('/api/admin/destinations', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error creating featured destination:', error);
+            throw error;
+        }
+    },
+
+    // Toggle the active status of a featured destination
+    toggleFeaturedDestinationStatus: async (destinationId) => {
+        try {
+            const response = await api.put(`/api/admin/destinations/${destinationId}/toggle-status`);
+            return response.data;
+        } catch (error) {
+            console.error('Error toggling featured destination status:', error);
+            throw error;
+        }
+    },
+
+    // Delete a featured destination
+    deleteFeaturedDestination: async (destinationId) => {
+        try {
+            const response = await api.delete(`/api/admin/destinations/${destinationId}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error deleting featured destination:', error);
+            throw error;
+        }
+    }
+};
+
 export default api;

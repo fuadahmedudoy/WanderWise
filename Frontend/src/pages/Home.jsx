@@ -68,6 +68,9 @@ const Home = () => {
         {effectiveUser ? (
           <div className="action-buttons">
             <NotificationCenter />
+            {effectiveUser.role === 'ADMIN' && (
+              <button onClick={() => navigate('/admin')} className="btn-outline admin-btn">Admin Dashboard</button>
+            )}
             <button onClick={() => navigate('/profile')} className="btn-outline">Profile</button>
             <button onClick={handleLogout} className="btn-outline">Logout</button>
           </div>

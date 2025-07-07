@@ -162,7 +162,17 @@ const Profile = () => {
                     ) : (
                         <div className="profile-view">
                             <div className="profile-picture">
-                                <img src={profile.profilePictureUrl || 'https://via.placeholder.com/150'} alt="Profile" />
+                                {profile.profilePictureUrl ? (
+                                    <img 
+                                        src={process.env.NODE_ENV === 'development' 
+                                            ? `http://localhost:8080${profile.profilePictureUrl.startsWith('/') ? '' : '/'}${profile.profilePictureUrl}` 
+                                            : profile.profilePictureUrl} 
+                                        alt="Profile" 
+                                    />
+                                ) : (
+                                   <img src="https://via.placeholder.com/150" alt="Profile" />
+                                )}
+                                
                             </div>
                             <div className="profile-info">
                                 <h2>{profile.firstName} {profile.lastName}</h2>
