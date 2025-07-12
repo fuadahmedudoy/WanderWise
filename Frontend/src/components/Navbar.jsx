@@ -27,6 +27,7 @@ const Navbar = () => {
       
       {effectiveUser ? (
         <div className="action-buttons">
+          <button onClick={() => navigate('/create-blog')} className="btn-outline">Write Blog</button> {/* NEW */}
           <button onClick={() => navigate('/my-trips')} className="btn-outline nav-btn">My Trips</button>
           <NotificationCenter />
           {effectiveUser.role === 'ADMIN' && (

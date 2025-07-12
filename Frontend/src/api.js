@@ -247,4 +247,117 @@ export const adminApi = {
     }
 };
 
+// API Functions for Blog Posts
+export const blogApi = {
+    createBlogPost: async (blogPostData, imageFile) => {
+        try {
+            const formData = new FormData();
+            formData.append('blogPost', new Blob([JSON.stringify(blogPostData)], {
+                type: 'application/json'
+            }));
+            if (imageFile) {
+                formData.append('image', imageFile);
+            }
+            const response = await api.post('/api/blogs', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error creating blog post:', error);
+            throw error;
+        }
+    },
+
+    // getAllBlogPosts: async () => {
+    //     try {
+    //         const response = await api.get('/api/blogs');
+    //         return response.data;
+    //     } catch (error) {
+    //         console.error('Error fetching all blog posts:', error);
+    //         throw error;
+    //     }
+    // },
+
+    getAllBlogPosts: async () => {
+        try {
+            const response = await api.get('/api/blogs');
+            // The response is coming back as an array already, but with circular references
+            // Just check if it's an array and return it
+            if (response.data && Array.isArray(response.data)) {
+                console.log("Retrieved blog posts successfully:", response.data.length);
+                return response.data;
+            } else if (response.data && Array.isArray(response.data.content)) {
+                // Handle Spring pagination format if present
+                return response.data.content;
+            } else {
+                console.warn('Unexpected response format from blog API');
+                // Log the actual data structure to help debug
+                console.error('Unexpected response format:', response.data);
+
+                // If it's an object with blog posts inside, try to extract them
+                if (response.data && typeof response.data === 'object') {
+                    // Check for common container properties
+                    if (response.data.blogs) return response.data.blogs;
+                    if (response.data.posts) return response.data.posts;
+                    if (response.data.items) return response.data.items;
+                    
+                    // If none of the above, try to convert object to array if possible
+                    const possibleArray = Object.values(response.data);
+                    if (possibleArray.length > 0 && typeof possibleArray[0] === 'object') {
+                        return possibleArray;
+                    }
+                }
+                return []; // Return empty array as fallback
+            }
+        } catch (error) {
+            console.error('Error fetching all blog posts:', error);
+            throw error;
+        }
+    },
+
+    getBlogPostById: async (id) => {
+        try {
+            const response = await api.get(`/api/blogs/${id}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching blog post by ID:', error);
+            throw error;
+        }
+    },
+    
+    // Optional: Add update and delete if needed for the frontend
+    updateBlogPost: async (id, blogPostData, imageFile) => {
+        try {
+            const formData = new FormData();
+            formData.append('blogPost', new Blob([JSON.stringify(blogPostData)], {
+                type: 'application/json'
+            }));
+            if (imageFile) {
+                formData.append('image', imageFile);
+            }
+            const response = await api.put(`/api/blogs/${id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error updating blog post:', error);
+            throw error;
+        }
+    },
+
+    deleteBlogPost: async (id) => {
+        try {
+            const response = await api.delete(`/api/blogs/${id}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error deleting blog post:', error);
+            throw error;
+        }
+    }
+};
+
 export default api;

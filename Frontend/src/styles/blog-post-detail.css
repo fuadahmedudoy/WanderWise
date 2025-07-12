@@ -1,0 +1,135 @@
+.blog-detail-container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+  padding: 20px;
+}
+
+.blog-detail-header {
+  max-width: 800px;
+  margin: 0 auto 30px auto;
+  text-align: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.blog-detail-header .back-button {
+  background: none;
+  border: none;
+  color: #4a80f0;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 20px;
+  display: block; /* Make it a block element to center text if needed */
+  width: fit-content;
+  margin-left: 0;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background-color 0.2s ease;
+}
+
+.blog-detail-header .back-button:hover {
+  background-color: rgba(74, 128, 240, 0.1);
+}
+
+.blog-detail-header h1 {
+  font-size: 2.5rem;
+  color: #212529;
+  margin-bottom: 10px;
+}
+
+.blog-meta {
+  font-size: 0.95rem;
+  color: #6c757d;
+  margin-bottom: 15px;
+}
+
+.blog-tags-detail {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.blog-tag-detail {
+  background-color: #e9f0f9;
+  color: #4a80f0;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.blog-detail-content {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.blog-featured-image {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.blog-content p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-bottom: 20px;
+  color: #495057;
+}
+
+.blog-detail-card.error-card,
+.blog-detail-card.not-found-card {
+  text-align: center;
+  padding: 40px;
+  margin-top: 50px;
+  border: 1px solid #dee2e6;
+}
+
+.blog-detail-card h2 {
+  font-size: 2rem;
+  color: #dc3545;
+  margin-bottom: 15px;
+}
+
+.blog-detail-card.not-found-card h2 {
+    color: #ffc107;
+}
+
+.blog-detail-card p {
+  font-size: 1.1rem;
+  color: #6c757d;
+  margin-bottom: 30px;
+}
+
+.blog-detail-card .btn-primary {
+  padding: 10px 25px;
+  font-size: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .blog-detail-header {
+    padding: 0 1rem 15px 1rem;
+  }
+
+  .blog-detail-header h1 {
+    font-size: 2rem;
+  }
+
+  .blog-detail-content {
+    padding: 20px;
+  }
+
+  .blog-content p {
+    font-size: 1rem;
+  }
+}

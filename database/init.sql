@@ -14,7 +14,7 @@ CREATE TABLE public.blog_posts (
     user_id uuid NOT NULL,
     title character varying(255) NOT NULL,
     content text NOT NULL,
-    trip_id uuid,
+    image_url character varying(255),
     tags text[] DEFAULT '{}'::text[],
     is_public boolean DEFAULT true,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,

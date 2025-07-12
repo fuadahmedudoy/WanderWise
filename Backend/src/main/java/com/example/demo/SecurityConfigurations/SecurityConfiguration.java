@@ -26,6 +26,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.http.HttpMethod.OPTIONS;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+
 
 @EnableWebSecurity
 @Configuration
@@ -81,6 +84,10 @@ public class SecurityConfiguration {
                                 "/login/oauth2/code/**", "/oauth2/**", "/oauth2/authorization/**",
                                 "/api/verify-otp", "/api/resend-otp", "/api/cleanup-pending",
                                 "/api/destinations/featured", "/api/destinations/**","/ws/**").permitAll()
+                        // Public access for viewing blogs
+                        .requestMatchers(GET, "/api/blogs", "/api/blogs/**").permitAll()
+                        // Authenticated access for creating/managing blogs
+                        .requestMatchers(POST, "/api/blogs").authenticated()
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2

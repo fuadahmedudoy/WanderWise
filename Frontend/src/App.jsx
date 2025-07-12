@@ -13,6 +13,8 @@ import Profile from './pages/Profile';
 import DestinationDetail from './pages/DestinationDetail';
 import WeatherDetails from './pages/WeatherDetails';
 import AdminDashboard from './pages/AdminDashboard';
+import CreateBlog from './pages/CreateBlog'; // NEW
+import BlogPostDetail from './pages/BlogPostDetail'; // NEW
 import './styles/global.css';
 
 function App() {
@@ -26,6 +28,18 @@ function App() {
           <Route path="/oauth-success" element={<OAuthSuccess />} />
           <Route path="/" element={<Home />} />
           <Route path="/destination/:id" element={<DestinationDetail />} />
+          
+          {/* New Blog Routes */}
+          <Route 
+            path="/create-blog" 
+            element={
+              <RequireAuth>
+                <CreateBlog />
+              </RequireAuth>
+            } 
+          />
+          <Route path="/blog/:id" element={<BlogPostDetail />} /> {/* Public access */}
+
           <Route 
             path="/weather-details/:tripId" 
             element={
