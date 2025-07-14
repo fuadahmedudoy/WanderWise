@@ -1,6 +1,6 @@
 
 package com.example.demo.entity;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "blog_posts")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class BlogPost {
 
     @Id

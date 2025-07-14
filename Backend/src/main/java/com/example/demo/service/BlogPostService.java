@@ -48,18 +48,18 @@ public class BlogPostService {
     }
 
     @Transactional
-    public BlogPost createBlogPost(UUID userId, CreateBlogPostRequest request, MultipartFile imageFile) throws IOException {
+    public BlogPostDTO createBlogPost(UUID userId, CreateBlogPostRequest request, MultipartFile imageFile) throws IOException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
         String imageUrl = null;
         if (imageFile != null && !imageFile.isEmpty()) {
-            imageUrl = adminFileStorageService.saveDestinationImage(imageFile); // Reusing method to save to /images
+            imageUrl = adminFileStorageService.saveDestinationImage(imageFile);
         }
 
         BlogPost blogPost = BlogPost.builder()
                 .userId(userId)
-                .user(user) // Link user object
+                .user(user) 
                 .title(request.getTitle())
                 .content(request.getContent())
                 .imageUrl(imageUrl)
@@ -69,7 +69,8 @@ public class BlogPostService {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        return blogPostRepository.save(blogPost);
+        BlogPost savedBlogPost = blogPostRepository.save(blogPost);
+        return convertToDTO(savedBlogPost);
     }
 
     public List<BlogPostDTO> getAllPublicBlogPosts() {
@@ -91,9 +92,9 @@ public class BlogPostService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    // Optional: Add update and delete methods
+    
     @Transactional
-    public BlogPost updateBlogPost(UUID blogId, UUID userId, CreateBlogPostRequest request, MultipartFile imageFile) throws IOException {
+    public BlogPostDTO updateBlogPost(UUID blogId, UUID userId, CreateBlogPostRequest request, MultipartFile imageFile) throws IOException {
         BlogPost existingPost = blogPostRepository.findById(blogId)
                 .orElseThrow(() -> new ResourceNotFoundException("Blog post not found with id: " + blogId));
 
@@ -112,15 +113,11 @@ public class BlogPostService {
                 adminFileStorageService.deleteDestinationImage(existingPost.getImageUrl());
             }
             existingPost.setImageUrl(adminFileStorageService.saveDestinationImage(imageFile));
-        } else if (request.getIsPublic() != null && !request.getIsPublic() && existingPost.getImageUrl() != null) {
-            // If the post is being made private and has an image, consider keeping the image.
-            // If the client explicitly sends a request to remove the image (e.g., imageUrl: null in DTO),
-            // then delete it. For now, we assume if no new file is provided, keep existing or set null.
-            // A more robust API would have a flag for image deletion.
         }
 
         existingPost.setUpdatedAt(LocalDateTime.now());
-        return blogPostRepository.save(existingPost);
+        BlogPost updatedPost = blogPostRepository.save(existingPost);
+        return convertToDTO(updatedPost);
     }
 
     @Transactional

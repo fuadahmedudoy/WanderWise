@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { blogApi } from '../api';
-import '../styles/blog-post-detail.css'; // Assuming a new CSS file for detailed blog view
+import '../styles/blog-post-detail.css'; 
 
 const BlogPostDetail = () => {
   const { id } = useParams();
@@ -72,9 +72,9 @@ const BlogPostDetail = () => {
           ← Back to Home
         </button>
         <h1>{blogPost.title}</h1>
-        <p className="blog-meta">
-          By {blogPost.user?.username || blogPost.user?.email || 'Anonymous'} on {formatDateTime(blogPost.createdAt)}
-        </p>
+       <p className="blog-meta">
+        By {blogPost.username || blogPost.userEmail || 'Anonymous'} on {formatDateTime(blogPost.createdAt)}
+      </p>
         {blogPost.tags && blogPost.tags.length > 0 && (
           <div className="blog-tags-detail">
             {blogPost.tags.map((tag, idx) => (

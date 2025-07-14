@@ -293,22 +293,6 @@ export const blogApi = {
                 return response.data.content;
             } else {
                 console.warn('Unexpected response format from blog API');
-                // Log the actual data structure to help debug
-                console.error('Unexpected response format:', response.data);
-
-                // If it's an object with blog posts inside, try to extract them
-                if (response.data && typeof response.data === 'object') {
-                    // Check for common container properties
-                    if (response.data.blogs) return response.data.blogs;
-                    if (response.data.posts) return response.data.posts;
-                    if (response.data.items) return response.data.items;
-                    
-                    // If none of the above, try to convert object to array if possible
-                    const possibleArray = Object.values(response.data);
-                    if (possibleArray.length > 0 && typeof possibleArray[0] === 'object') {
-                        return possibleArray;
-                    }
-                }
                 return []; // Return empty array as fallback
             }
         } catch (error) {

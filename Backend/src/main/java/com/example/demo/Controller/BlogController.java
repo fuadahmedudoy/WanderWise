@@ -42,7 +42,7 @@ public class BlogController {
 
         try {
             CreateBlogPostRequest request = objectMapper.readValue(blogPostJson, CreateBlogPostRequest.class);
-            BlogPost newBlogPost = blogPostService.createBlogPost(user.getId(), request, image);
+            BlogPostDTO newBlogPost = blogPostService.createBlogPost(user.getId(), request, image);
             return ResponseEntity.status(HttpStatus.CREATED).body(newBlogPost);
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Error processing blog post or image: " + e.getMessage()));
@@ -69,7 +69,7 @@ public class BlogController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Authentication required to view your blog posts."));
         }
-        List<BlogPost> userBlogs = blogPostService.getUserBlogPosts(user.getId());
+        List<BlogPostDTO> userBlogs = blogPostService.getUserBlogPosts(user.getId());
         return ResponseEntity.ok(userBlogs);
     }
 
@@ -86,7 +86,7 @@ public class BlogController {
         
         try {
             CreateBlogPostRequest request = objectMapper.readValue(blogPostJson, CreateBlogPostRequest.class);
-            BlogPost updatedBlogPost = blogPostService.updateBlogPost(id, user.getId(), request, image);
+            BlogPostDTO updatedBlogPost = blogPostService.updateBlogPost(id, user.getId(), request, image);
             return ResponseEntity.ok(updatedBlogPost);
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", e.getMessage()));

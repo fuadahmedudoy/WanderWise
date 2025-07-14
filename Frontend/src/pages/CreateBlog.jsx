@@ -123,7 +123,7 @@ const CreateBlog = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="image">Upload Image (Optional)</label>
+              <label htmlFor="image">Upload Image </label>
               <input
                 type="file"
                 id="image"

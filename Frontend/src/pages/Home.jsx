@@ -211,7 +211,7 @@ const Home = () => {
                   <div className="blog-card-content">
                     <h3>{post.title}</h3>
                     <p className="blog-author-date">
-                        By {post.user?.username || post.user?.email || 'Anonymous'} on {formatDateTime(post.createdAt)}
+                      By {post.username || post.userEmail || 'Anonymous'} on {formatDateTime(post.createdAt)}
                     </p>
                     <p className="blog-snippet">{post.content.substring(0, 150)}...</p>
                     {post.tags && post.tags.length > 0 && (
