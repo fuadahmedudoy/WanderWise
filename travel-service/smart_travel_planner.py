@@ -298,6 +298,8 @@ Generate a comprehensive JSON travel plan using ALL the provided spots, hotels, 
 Instructions:
 - Use EVERY spot, hotel, and restaurant from the provided data
 - Include transportation details between activities, meals, and hotels
+- Choose realistic transportation modes based on the distance between origin and destination.
+  For example, avoid using rickshaws for intercity travel like Dhaka to Sylhet or Jaflong
 - **CRITICAL: SYNCHRONIZE ALL TIMES PERFECTLY**
   * Transportation arrival time = Activity/Meal start time
   * Activity/Meal end time = Next transportation departure time
