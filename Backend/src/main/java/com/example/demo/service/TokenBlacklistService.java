@@ -24,10 +24,12 @@ public class TokenBlacklistService {
      * Add a token to the blacklist
      */
     public void blacklistToken(String token) {
-        BlacklistedToken blacklistedToken = new BlacklistedToken();
-        blacklistedToken.setToken(token);
-        blacklistedToken.setExpiryDate(jwtUtility.extractExpiration(token));
-        repository.save(blacklistedToken);
+        if(!repository.existsById(token)) {
+            BlacklistedToken blacklistedToken = new BlacklistedToken();
+            blacklistedToken.setToken(token);
+            blacklistedToken.setExpiryDate(jwtUtility.extractExpiration(token));
+            repository.save(blacklistedToken);
+        }
     }
 
     /**

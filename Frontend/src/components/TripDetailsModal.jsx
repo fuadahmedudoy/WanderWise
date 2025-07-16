@@ -77,6 +77,22 @@ const TripDetailsModal = ({ trip, isOpen, onClose }) => {
                     </div>
 
                     <div className="day-activities-modal">
+                      {/* Transportation to Morning Activity */}
+                      {day.transportation_morning && (
+                        <div className="transport-block-modal">
+                          <div className="transport-header">
+                            🚗 Transportation to Morning Activity
+                          </div>
+                          <div className="transport-details">
+                            <span>From: {day.transportation_morning.from}</span>
+                            <span>To: {day.transportation_morning.to}</span>
+                            <span>Mode: {day.transportation_morning.mode}</span>
+                            <span>Time: {day.transportation_morning.departure_time} - {day.transportation_morning.arrival_time}</span>
+                            <span>Cost: ৳{day.transportation_morning.cost}</span>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Morning Activity */}
                       {day.morning_activity && (
                         <div className="activity-block-modal morning">
@@ -87,12 +103,37 @@ const TripDetailsModal = ({ trip, isOpen, onClose }) => {
                             {day.morning_activity.entry_fee > 0 && (
                               <span className="fee-modal">Entry: ৳{day.morning_activity.entry_fee}</span>
                             )}
+                            {day.morning_activity.location && (
+                              <p className="location-modal">📍 {day.morning_activity.location}</p>
+                            )}
+                            {day.morning_activity.duration && (
+                              <p className="duration-modal">⏱️ Duration: {day.morning_activity.duration}</p>
+                            )}
+                            {day.morning_activity.highlights && (
+                              <p className="highlights-modal">✨ {day.morning_activity.highlights}</p>
+                            )}
                             <TripImage 
                               src={day.morning_activity.image_url} 
                               alt={day.morning_activity.spot_name} 
                               className="activity-image-modal"
                               fallbackType="spot"
                             />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Transportation to Lunch */}
+                      {day.transportation_lunch && (
+                        <div className="transport-block-modal">
+                          <div className="transport-header">
+                            🚗 Transportation to Lunch
+                          </div>
+                          <div className="transport-details">
+                            <span>From: {day.transportation_lunch.from}</span>
+                            <span>To: {day.transportation_lunch.to}</span>
+                            <span>Mode: {day.transportation_lunch.mode}</span>
+                            <span>Time: {day.transportation_lunch.departure_time} - {day.transportation_lunch.arrival_time}</span>
+                            <span>Cost: ৳{day.transportation_lunch.cost}</span>
                           </div>
                         </div>
                       )}
@@ -106,7 +147,10 @@ const TripDetailsModal = ({ trip, isOpen, onClose }) => {
                               <div key={idx} className="restaurant-option-modal">
                                 <h5>{restaurant.restaurant_name}</h5>
                                 <p>{restaurant.cuisine} • ⭐ {restaurant.rating}/5</p>
+                                {restaurant.time && <p className="meal-time-modal">🕐 {restaurant.time}</p>}
                                 <span className="cost-modal">৳{restaurant.cost_per_person}/person</span>
+                                {restaurant.address && <p className="address-modal">📍 {restaurant.address}</p>}
+                                {restaurant.specialties && <p className="specialties-modal">🍽️ {restaurant.specialties}</p>}
                                 <TripImage 
                                   src={restaurant.image_url} 
                                   alt={restaurant.restaurant_name} 
@@ -115,6 +159,22 @@ const TripDetailsModal = ({ trip, isOpen, onClose }) => {
                                 />
                               </div>
                             ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Transportation to Afternoon Activity */}
+                      {day.transportation_afternoon && (
+                        <div className="transport-block-modal">
+                          <div className="transport-header">
+                            🚗 Transportation to Afternoon Activity
+                          </div>
+                          <div className="transport-details">
+                            <span>From: {day.transportation_afternoon.from}</span>
+                            <span>To: {day.transportation_afternoon.to}</span>
+                            <span>Mode: {day.transportation_afternoon.mode}</span>
+                            <span>Time: {day.transportation_afternoon.departure_time} - {day.transportation_afternoon.arrival_time}</span>
+                            <span>Cost: ৳{day.transportation_afternoon.cost}</span>
                           </div>
                         </div>
                       )}
@@ -132,6 +192,15 @@ const TripDetailsModal = ({ trip, isOpen, onClose }) => {
                                 {activity.entry_fee > 0 && (
                                   <span className="fee-modal">Entry: ৳{activity.entry_fee}</span>
                                 )}
+                                {activity.location && (
+                                  <p className="location-modal">📍 {activity.location}</p>
+                                )}
+                                {activity.duration && (
+                                  <p className="duration-modal">⏱️ Duration: {activity.duration}</p>
+                                )}
+                                {activity.highlights && (
+                                  <p className="highlights-modal">✨ {activity.highlights}</p>
+                                )}
                                 <TripImage 
                                   src={activity.image_url} 
                                   alt={activity.spot_name} 
@@ -140,6 +209,22 @@ const TripDetailsModal = ({ trip, isOpen, onClose }) => {
                                 />
                               </div>
                             ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Transportation to Dinner */}
+                      {day.transportation_dinner && (
+                        <div className="transport-block-modal">
+                          <div className="transport-header">
+                            🚗 Transportation to Dinner
+                          </div>
+                          <div className="transport-details">
+                            <span>From: {day.transportation_dinner.from}</span>
+                            <span>To: {day.transportation_dinner.to}</span>
+                            <span>Mode: {day.transportation_dinner.mode}</span>
+                            <span>Time: {day.transportation_dinner.departure_time} - {day.transportation_dinner.arrival_time}</span>
+                            <span>Cost: ৳{day.transportation_dinner.cost}</span>
                           </div>
                         </div>
                       )}
@@ -153,7 +238,10 @@ const TripDetailsModal = ({ trip, isOpen, onClose }) => {
                               <div key={idx} className="restaurant-option-modal">
                                 <h5>{restaurant.restaurant_name}</h5>
                                 <p>{restaurant.cuisine} • ⭐ {restaurant.rating}/5</p>
+                                {restaurant.time && <p className="meal-time-modal">🕐 {restaurant.time}</p>}
                                 <span className="cost-modal">৳{restaurant.cost_per_person}/person</span>
+                                {restaurant.address && <p className="address-modal">📍 {restaurant.address}</p>}
+                                {restaurant.specialties && <p className="specialties-modal">🍽️ {restaurant.specialties}</p>}
                                 <TripImage 
                                   src={restaurant.image_url} 
                                   alt={restaurant.restaurant_name} 
@@ -162,6 +250,22 @@ const TripDetailsModal = ({ trip, isOpen, onClose }) => {
                                 />
                               </div>
                             ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Transportation to Hotel */}
+                      {day.transportation_hotel && (
+                        <div className="transport-block-modal">
+                          <div className="transport-header">
+                            🚗 Transportation to Hotel
+                          </div>
+                          <div className="transport-details">
+                            <span>From: {day.transportation_hotel.from}</span>
+                            <span>To: {day.transportation_hotel.to}</span>
+                            <span>Mode: {day.transportation_hotel.mode}</span>
+                            <span>Time: {day.transportation_hotel.departure_time} - {day.transportation_hotel.arrival_time}</span>
+                            <span>Cost: ৳{day.transportation_hotel.cost}</span>
                           </div>
                         </div>
                       )}
@@ -179,6 +283,21 @@ const TripDetailsModal = ({ trip, isOpen, onClose }) => {
                                   <span className="cost-modal">৳{hotel.cost_per_night}/night</span>
                                   <span className="amenities-modal">🎯 {hotel.amenities}</span>
                                 </div>
+                                {hotel.check_in_time && (
+                                  <p className="check-in-time-modal">🕐 Check-in: {hotel.check_in_time}</p>
+                                )}
+                                {hotel.address && (
+                                  <p className="address-modal">📍 {hotel.address}</p>
+                                )}
+                                {hotel.contact && (
+                                  <p className="contact-modal">📞 {hotel.contact}</p>
+                                )}
+                                {hotel.room_type && (
+                                  <p className="room-type-modal">🏨 {hotel.room_type}</p>
+                                )}
+                                {hotel.facilities && (
+                                  <p className="facilities-modal">🏊 {hotel.facilities}</p>
+                                )}
                                 <TripImage 
                                   src={hotel.image_url} 
                                   alt={hotel.hotel_name} 

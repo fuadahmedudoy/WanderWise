@@ -182,52 +182,105 @@ Generate a comprehensive JSON travel plan using ALL the provided spots, hotels, 
       "day": 1,
       "date": "YYYY-MM-DD",
       "weather": "weather description",
+
+      "transportation_morning": {{
+        "from": "hotel or city",
+        "to": "morning spot name",
+        "mode": "rickshaw / car / boat / walk / train / bus",
+        "departure_time": "8:30 AM",
+        "arrival_time": "9:00 AM",
+        "cost": 100
+      }},
       "morning_activity": {{
         "spot_name": "use spot from data",
         "time": "9:00 AM - 11:00 AM",
         "description": "activity details",
         "entry_fee": 0,
-        "image_url": ""
+        "image_url": "/trip-images/spot.jpg"
+      }},
+      
+      "transportation_lunch": {{
+        "from": "morning spot name",
+        "to": "restaurant name",
+        "mode": "walk / rickshaw / etc.",
+        "departure_time": "11:00 AM",
+        "arrival_time": "11:15 AM",
+        "cost": 50
       }},
       "lunch_options": [
         {{
           "restaurant_name": "from data",
           "cuisine": "type",
           "cost_per_person": 400,
-          "rating": 4.0
+          "rating": 4.0,
+          "image_url": "/trip-images/restaurant.jpg",
+          "time": "11:15 AM - 12:30 PM"
         }}
       ],
+
+      "transportation_afternoon": {{
+        "from": "restaurant name",
+        "to": "afternoon spot name",
+        "mode": "car / rickshaw",
+        "departure_time": "12:30 PM",
+        "arrival_time": "1:00 PM",
+        "cost": 150
+      }},
       "afternoon_activities": [
         {{
           "spot_name": "from data",
-          "time": "2:00 PM - 5:00 PM",
+          "time": "1:00 PM - 5:00 PM",
           "description": "what to do",
-          "entry_fee": 0
+          "entry_fee": 0,
+          "image_url": "/trip-images/spot.jpg"
         }}
       ],
+
+      "transportation_dinner": {{
+        "from": "afternoon spot",
+        "to": "restaurant name",
+        "mode": "walk / rickshaw / car",
+        "departure_time": "5:00 PM",
+        "arrival_time": "5:30 PM",
+        "cost": 80
+      }},
       "dinner_options": [
         {{
           "restaurant_name": "from data",
           "cuisine": "type",
           "cost_per_person": 500,
-          "rating": 4.2
+          "rating": 4.2,
+          "image_url": "/trip-images/restaurant.jpg",
+          "time": "5:30 PM - 7:00 PM"
         }}
       ],
+
+      "transportation_hotel": {{
+        "from": "restaurant",
+        "to": "hotel name",
+        "mode": "car / walk",
+        "departure_time": "7:00 PM",
+        "arrival_time": "7:30 PM",
+        "cost": 100
+      }},
       "accommodation_options": [
         {{
           "hotel_name": "from data",
           "rating": 4.0,
           "cost_per_night": 3000,
-          "amenities": "features"
+          "amenities": "features",
+          "image_url": "/trip-images/hotel.jpg",
+          "check_in_time": "7:30 PM"
         }}
       ],
+
       "day_budget": {{
         "accommodation": 3000,
         "meals": 900,
         "activities": 50,
-        "transport": 200,
+        "transport": 480,
         "misc": 100,
-        "total": 4250
+        "total": 4530
       }}
     }}
   ],
@@ -235,21 +288,40 @@ Generate a comprehensive JSON travel plan using ALL the provided spots, hotels, 
     "total_accommodation": 9000,
     "total_meals": 2700,
     "total_activities": 150,
-    "total_transport": 600,
+    "total_transport": 1440,
     "total_misc": 300,
-    "grand_total": 12750,
-    "remaining": 2250
+    "grand_total": 13590,
+    "remaining": -3590
   }}
 }}
 
 Instructions:
-- Use EVERY spot, hotel, restaurant from the provided data
-- Multiple options for meals and hotels
-- Weather-appropriate activities
-- Realistic timing and costs
-- Include image URLs using the format: "/trip-images/[image_name].jpg"
-- Match image names to location names (e.g., "Jaflong" -> "/trip-images/jaflong.jpg")
-- Available images: jaflong.jpg, ratargul.jpg, lalakhal.jpg, sajek_valley.jpg, kaptai_lake.jpg, hanging_bridge.jpg, rajban_vihara.jpg, shahjalal_dargah.jpg, hotel_metro.jpg, garden_inn.jpg, sajek_resort.jpg, lalakhal_resort.jpg, paharika_inn.jpg, hotel_swamp_view.jpg, tribal_food.jpg, valley_cafe.jpg, woondal.jpg, blue_water.jpg, star_pacific.jpg, vihara_view.jpg, kutum_bari.jpg
+- Use EVERY spot, hotel, and restaurant from the provided data
+- Include transportation details between activities, meals, and hotels
+- **CRITICAL: SYNCHRONIZE ALL TIMES PERFECTLY**
+  * Transportation arrival time = Activity/Meal start time
+  * Activity/Meal end time = Next transportation departure time
+  * Example: Morning activity 9:00 AM - 11:00 AM → Lunch transport departs 11:00 AM → Lunch 11:15 AM - 12:30 PM
+- Weather-appropriate activities (e.g., avoid rain-prone times outdoors)
+- Use realistic durations (e.g., 30 mins walk, 2 hrs by bus)
+- Use realistic cost estimates for each transport type
+- Multiple options for meals and hotels when possible
+- Return ONLY a properly formatted valid JSON
+- Use image URLs in format: /trip-images/[name].jpg based on item name
+
+## TIME SYNCHRONIZATION RULES:
+1. Day starts: 8:30 AM (hotel departure)
+2. Morning Activity: 9:00 AM - 11:00 AM (2 hours)
+3. Transport to Lunch: 11:00 AM - 11:15 AM (15 mins)
+4. Lunch: 11:15 AM - 12:30 PM (1.25 hours)
+5. Transport to Afternoon: 12:30 PM - 1:00 PM (30 mins)
+6. Afternoon Activities: 1:00 PM - 5:00 PM (4 hours)
+7. Transport to Dinner: 5:00 PM - 5:30 PM (30 mins)
+8. Dinner: 5:30 PM - 7:00 PM (1.5 hours)
+9. Transport to Hotel: 7:00 PM - 7:30 PM (30 mins)
+10. Hotel Check-in: 7:30 PM
+
+Available images: jaflong.jpg, ratargul.jpg, lalakhal.jpg, sajek_valley.jpg, kaptai_lake.jpg, hanging_bridge.jpg, rajban_vihara.jpg, shahjalal_dargah.jpg, hotel_metro.jpg, garden_inn.jpg, sajek_resort.jpg, lalakhal_resort.jpg, paharika_inn.jpg, hotel_swamp_view.jpg, tribal_food.jpg, valley_cafe.jpg, woondal.jpg, blue_water.jpg, star_pacific.jpg, vihara_view.jpg, kutum_bari.jpg
 - Return ONLY valid JSON"""
 
     try:
