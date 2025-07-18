@@ -133,3 +133,49 @@
     font-size: 1rem;
   }
 }
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.author-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: 1px solid #4CAF50;
+}
+
+.edit-btn:hover {
+  background-color: #45a049;
+}
+
+.delete-btn {
+  background-color: #f44336;
+  color: white;
+  border: 1px solid #f44336;
+}
+
+.delete-btn:hover {
+  background-color: #da190b;
+}
+
+.delete-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.current-image {
+  margin-bottom: 1rem;
+}
+
+.current-image img {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}

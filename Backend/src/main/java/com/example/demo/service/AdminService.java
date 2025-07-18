@@ -1,8 +1,11 @@
 package com.example.demo.service;
 
 import com.example.demo.Repository.FeaturedDestinationRepository;
+import com.example.demo.Repository.BlogPostRepository;
 import com.example.demo.dto.CreateFeaturedDestinationRequest;
+import com.example.demo.dto.BlogPostDTO;
 import com.example.demo.entity.FeaturedDestination;
+import com.example.demo.entity.BlogPost;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +15,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminService {
@@ -21,6 +25,25 @@ public class AdminService {
 
     @Autowired
     private AdminFileStorageService fileStorageService;
+
+    @Autowired
+    private BlogPostRepository blogPostRepository;
+
+    private BlogPostDTO convertToDTO(BlogPost blogPost) {
+        return BlogPostDTO.builder()
+                .id(blogPost.getId())
+                .userId(blogPost.getUserId())
+                .title(blogPost.getTitle())
+                .content(blogPost.getContent())
+                .imageUrl(blogPost.getImageUrl())
+                .tags(blogPost.getTags())
+                .isPublic(blogPost.isPublic())
+                .createdAt(blogPost.getCreatedAt())
+                .updatedAt(blogPost.getUpdatedAt())
+                .username(blogPost.getUser() != null ? blogPost.getUser().getUsername() : null)
+                .userEmail(blogPost.getUser() != null ? blogPost.getUser().getEmail() : null)
+                .build();
+    }
 
     /**
      * Get all featured destinations
@@ -103,4 +126,25 @@ public class AdminService {
         
         featuredDestinationRepository.deleteById(id);
     }
+
+    public List<BlogPostDTO> getAllPublicBlogPosts() {
+        List<BlogPost> posts = blogPostRepository.findByIsPublicTrueOrderByCreatedAtDesc();
+        return posts.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteBlogPost(UUID id) {
+        BlogPost post = blogPostRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("BlogPost not found"));
+        
+        // Delete the image file if it exists
+        if (post.getImageUrl() != null && !post.getImageUrl().isEmpty()) {
+            fileStorageService.deleteDestinationImage(post.getImageUrl());
+        }
+        
+        blogPostRepository.deleteById(id);
+    }
+
 }

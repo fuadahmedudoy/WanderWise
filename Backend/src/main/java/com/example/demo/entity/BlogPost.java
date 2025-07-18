@@ -37,7 +37,7 @@ public class BlogPost {
     private String content;
 
     @Column(name = "image_url")
-    private String imageUrl; // This can be null if no image is uploaded
+    private String imageUrl;
 
     @Column(columnDefinition = "text[]")
     private String[] tags;

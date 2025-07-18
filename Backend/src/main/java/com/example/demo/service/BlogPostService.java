@@ -75,7 +75,6 @@ public class BlogPostService {
 
     public List<BlogPostDTO> getAllPublicBlogPosts() {
         List<BlogPost> posts = blogPostRepository.findByIsPublicTrueOrderByCreatedAtDesc();
-        System.out.println("Returning " + posts.size() + " public blog posts");
         return posts.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
