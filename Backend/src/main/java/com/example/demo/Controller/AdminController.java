@@ -1,6 +1,7 @@
 package com.example.demo.Controller;
 
 import com.example.demo.dto.CreateFeaturedDestinationRequest;
+import com.example.demo.dto.BlogPostDTO;
 import com.example.demo.entity.FeaturedDestination;
 import com.example.demo.entity.User;
 import com.example.demo.service.AdminService;
@@ -129,6 +130,57 @@ public class AdminController {
         try {
             FeaturedDestination updatedDestination = adminService.toggleFeaturedDestinationStatus(id);
             return ResponseEntity.ok(updatedDestination);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+
+
+    /**
+     * Get all blog posts
+     * 
+     * @param user The authenticated user
+     * @return List of all blog posts
+     */
+    @GetMapping("/blogs")
+    public ResponseEntity<?> getAllPublicBlogPosts(
+            @AuthenticationPrincipal User user) {
+        
+        if (!"ADMIN".equals(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Only admin users can perform this action"));
+        }
+        
+        List<BlogPostDTO> blogPosts = adminService.getAllPublicBlogPosts();
+        return ResponseEntity.ok(blogPosts);
+    }
+
+    /**
+     * Delete a blog post
+     * 
+     * @param user The authenticated user
+     * @param id The ID of the featured destination to delete
+     * @return Success message or error
+     */
+    @DeleteMapping("/blogs/{id}")
+    public ResponseEntity<?> deleteBlogPost(
+            @AuthenticationPrincipal User user,
+            @PathVariable UUID id) {
+        
+        // Validate that the user is an admin
+        if (!"ADMIN".equals(user.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Only admin users can perform this action"));
+        }
+        
+        try {
+            adminService.deleteBlogPost(id);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Blog Post deleted successfully");
+            response.put("id", id.toString());
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("message", e.getMessage()));

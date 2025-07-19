@@ -1,37 +1,57 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useContext, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import { blogApi } from '../api';
-import '../styles/create-blog.css'; // Assuming a new CSS file for blog styles
+import '../styles/create-blog.css'; // Reuse the same styles
 
-const CreateBlog = () => {
+const EditBlog = () => {
+  const { id } = useParams();
   const { currentUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [imageFile, setImageFile] = useState(null);
-  const [tags, setTags] = useState(''); // Comma-separated string
+  const [currentImageUrl, setCurrentImageUrl] = useState('');
+  const [tags, setTags] = useState('');
   const [isPublic, setIsPublic] = useState(true);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(true);
 
-  // Redirect if not logged in
-  if (!currentUser) {
-    return (
-      <div className="auth-dialog-overlay">
-        <div className="auth-dialog">
-          <h2>Authentication Required</h2>
-          <p>You need to login first to write a blog post.</p>
-          <div className="auth-dialog-actions">
-            <button onClick={() => navigate('/auth/login')} className="btn-primary">Login</button>
-            <button onClick={() => navigate('/')} className="btn-outline">Go Back</button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    const fetchBlogPost = async () => {
+      try {
+        setFetchLoading(true);
+        const response = await blogApi.getBlogPostById(id);
+        
+        // Check if current user is the author
+        if (currentUser && (currentUser.id !== response.userId && currentUser.email !== response.userEmail)) {
+          setError('You are not authorized to edit this blog post.');
+          return;
+        }
+
+        setTitle(response.title || '');
+        setContent(response.content || '');
+        setCurrentImageUrl(response.imageUrl || '');
+        setTags(response.tags ? response.tags.join(', ') : '');
+        setIsPublic(response.isPublic !== undefined ? response.isPublic : true);
+      } catch (err) {
+        console.error('Error fetching blog post:', err);
+        setError('Failed to load blog post for editing.');
+      } finally {
+        setFetchLoading(false);
+      }
+    };
+
+    if (currentUser) {
+      fetchBlogPost();
+    } else {
+      setError('You must be logged in to edit a blog post.');
+      setFetchLoading(false);
+    }
+  }, [id, currentUser]);
 
   const handleFileChange = (e) => {
     setImageFile(e.target.files[0]);
@@ -50,42 +70,55 @@ const CreateBlog = () => {
     }
 
     const blogPostData = {
-      title,
-      content,
+      title: title.trim(),
+      content: content.trim(),
       tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0),
       isPublic,
     };
 
     try {
-      await blogApi.createBlogPost(blogPostData, imageFile);
-      setSuccessMessage('Blog post created successfully!');
-      console.log(" blog succesfully created");
-      // Clear form
-      setTitle('');
-      setContent('');
-      setImageFile(null);
-      setTags('');
-      setIsPublic(true);
-      navigate('/');
-      
+      await blogApi.updateBlogPost(id, blogPostData, imageFile);
+      setSuccessMessage('Blog post updated successfully!');
+      setTimeout(() => {
+        navigate(`/blog/${id}`);
+      }, 2000);
     } catch (err) {
-      console.error('Error creating blog post:', err);
-      setError(err.response?.data?.message || 'Failed to create blog post. Please try again.');
+      console.error('Error updating blog post:', err);
+      setError(err.response?.data?.message || 'Failed to update blog post. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+  if (fetchLoading) {
+    return <div className="create-blog-container">Loading blog post...</div>;
+  }
+
+  if (!currentUser) {
+    return (
+      <div className="auth-dialog-overlay">
+        <div className="auth-dialog">
+          <h2>Authentication Required</h2>
+          <p>You need to login first to edit a blog post.</p>
+          <div className="auth-dialog-actions">
+            <button onClick={() => navigate('/auth/login')} className="btn-primary">Login</button>
+            <button onClick={() => navigate('/')} className="btn-outline">Go Back</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="create-blog-container">
       <header className="create-blog-header">
         <div className="header-content">
-          <button onClick={() => navigate('/')} className="back-button">
-            ← Back to Home
+          <button onClick={() => navigate(`/blog/${id}`)} className="back-button">
+            ← Back to Blog Post
           </button>
           <div className="header-title">
-            <h1>Write a New Blog Post</h1>
-            <p>Share your travel experiences with the community</p>
+            <h1>Edit Blog Post</h1>
+            <p>Update your travel experience</p>
           </div>
         </div>
       </header>
@@ -121,13 +154,20 @@ const CreateBlog = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="image">Upload Image </label>
+              <label htmlFor="image">Update Image (optional)</label>
+              {currentImageUrl && (
+                <div className="current-image">
+                  <p>Current image:</p>
+                  <img src={currentImageUrl} alt="Current blog" style={{ maxWidth: '200px', maxHeight: '150px', objectFit: 'cover' }} />
+                </div>
+              )}
               <input
                 type="file"
                 id="image"
                 accept="image/*"
                 onChange={handleFileChange}
               />
+              <small>Leave empty to keep current image</small>
             </div>
 
             <div className="form-group">
@@ -156,7 +196,7 @@ const CreateBlog = () => {
               className="btn-primary" 
               disabled={loading}
             >
-              {loading ? 'Publishing...' : 'Publish Blog Post'}
+              {loading ? 'Updating...' : 'Update Blog Post'}
             </button>
           </form>
         </div>
@@ -165,4 +205,4 @@ const CreateBlog = () => {
   );
 };
 
-export default CreateBlog;
+export default EditBlog;
