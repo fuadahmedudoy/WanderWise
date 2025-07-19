@@ -220,6 +220,26 @@ CREATE TABLE travel_restaurants (
     image_url TEXT
 );
 
+-- Table for blog post likes
+CREATE TABLE public.blog_likes (
+    id uuid DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
+    blog_post_id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(blog_post_id, user_id)
+);
+
+-- Table for blog post comments
+CREATE TABLE public.blog_comments (
+    id uuid DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
+    blog_post_id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    content text NOT NULL,
+    parent_comment_id uuid NULL, -- For nested/reply comments
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
 COPY public."FeaturedDestination_reviews" ("FeaturedDestination_id", reviews, "reviews_ORDER") FROM stdin;
 \.
 
@@ -515,3 +535,25 @@ INSERT INTO travel_restaurants (spot_id, name, popular_dishes, avg_cost, lat, lo
 -- Restaurants for Rajban Vihara (spot_id = 8)
 (8, 'Monastery Café', 'Veggie curry, Rice, Tea', 180, 22.6147, 92.1847, 'https://cdn.example.com/images/monastery_cafe.jpg'),
 (8, 'Tranquil Bites', 'Local snacks, Herbal drinks', 150, 22.6155, 92.1850, 'https://cdn.example.com/images/tranquil_bites.jpg');
+
+
+
+-- ADD THIS LINE:
+ALTER TABLE ONLY public.blog_posts
+    ADD CONSTRAINT blog_posts_pkey PRIMARY KEY (id);
+
+-- Add foreign key constraints
+ALTER TABLE ONLY public.blog_likes
+    ADD CONSTRAINT blog_likes_blog_post_id_fkey FOREIGN KEY (blog_post_id) REFERENCES public.blog_posts(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.blog_likes
+    ADD CONSTRAINT blog_likes_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.blog_comments
+    ADD CONSTRAINT blog_comments_blog_post_id_fkey FOREIGN KEY (blog_post_id) REFERENCES public.blog_posts(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.blog_comments
+    ADD CONSTRAINT blog_comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.blog_comments
+    ADD CONSTRAINT blog_comments_parent_comment_id_fkey FOREIGN KEY (parent_comment_id) REFERENCES public.blog_comments(id) ON DELETE CASCADE;

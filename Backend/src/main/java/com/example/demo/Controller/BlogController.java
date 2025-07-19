@@ -52,14 +52,19 @@ public class BlogController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BlogPostDTO>> getAllPublicBlogPosts() {
-        List<BlogPostDTO> blogPosts = blogPostService.getAllPublicBlogPosts();
+    public ResponseEntity<List<BlogPostDTO>> getAllPublicBlogPosts(
+            @AuthenticationPrincipal User user) {
+        UUID currentUserId = user != null ? user.getId() : null;
+        List<BlogPostDTO> blogPosts = blogPostService.getAllPublicBlogPosts(currentUserId);
         return ResponseEntity.ok(blogPosts);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getBlogPostById(@PathVariable UUID id) {
-        return blogPostService.getBlogPostById(id)
+    public ResponseEntity<?> getBlogPostById(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User user) {
+        UUID currentUserId = user != null ? user.getId() : null;
+        return blogPostService.getBlogPostById(id, currentUserId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

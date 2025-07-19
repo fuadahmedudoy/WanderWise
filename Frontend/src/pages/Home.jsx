@@ -39,13 +39,13 @@ const Home = () => {
         setIsLoadingBlogs(true);
         setBlogError(null);
         const response = await blogApi.getAllBlogPosts();
-        setBlogPosts(response || []); // Fix: blogApi.getAllBlogPosts already returns response.data
+        setBlogPosts(Array.isArray(response) ? response : []); // Ensure it's always an array
         console.log(`Fetched ${response ? response.length : 0} blog posts`);
         setIsLoadingBlogs(false);
       } catch (err) {
         console.error('Error fetching blog posts:', err);
         setBlogError('Failed to load blog posts. Please try again later.');
-        setBlogPosts([]); // Ensure it's an empty array on error too
+        setBlogPosts([]); // Ensure it's an empty array on error
         setIsLoadingBlogs(false);
       }
     };
@@ -65,7 +65,7 @@ const Home = () => {
 
   const handleLogin = () => {
     navigate('/auth/login');
-  }
+  };
 
   const navigateToCreateTrip = () => {
     navigate('/create-trip');
@@ -181,7 +181,7 @@ const Home = () => {
         )}
       </div>
 
-      {/* New Blog Posts Section */}
+      {/* Blog Posts Section */}
       <div className="blog-section">
         <h2>Recent Blog Posts</h2>
         
@@ -200,7 +200,7 @@ const Home = () => {
         
         {!isLoadingBlogs && !blogError && (
           <div className="blog-cards">
-            {blogPosts.length > 0 ? (
+            {blogPosts && Array.isArray(blogPosts) && blogPosts.length > 0 ? (
               blogPosts.map(post => (
                 <div className="blog-card" key={post.id} onClick={() => navigateToBlogPost(post.id)}>
                   {post.imageUrl && (
@@ -221,20 +221,45 @@ const Home = () => {
                         ))}
                       </div>
                     )}
-                    <button 
-                      className="btn-outline view-details" 
-                      onClick={(e) => { e.stopPropagation(); navigateToBlogPost(post.id); }}
-                    >
-                      Read More
-                    </button>
+                    
+                    {/* Add interaction stats */}
+                    <div className="blog-stats">
+                      <span className="stat-item">
+                        <span className="stat-icon">❤️</span>
+                        <span className="stat-count">{post.likeCount || 0}</span>
+                      </span>
+                      <span className="stat-item">
+                        <span className="stat-icon">💬</span>
+                        <span className="stat-count">{post.commentCount || 0}</span>
+                      </span>
+                    </div>
+
+                    <div className="blog-card-actions">
+                      <button 
+                        className="btn-outline view-details" 
+                        onClick={(e) => { e.stopPropagation(); navigateToBlogPost(post.id); }}
+                      >
+                        Read More
+                      </button>
+                      {effectiveUser && (effectiveUser.id === post.userId || effectiveUser.email === post.userEmail) && (
+                        <div className="author-actions-small">
+                          <button 
+                            className="btn-outline edit-btn-small"
+                            onClick={(e) => { e.stopPropagation(); navigate(`/blog/edit/${post.id}`); }}
+                          >
+                            Edit
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))
             ) : (
               <div className="no-trips-message">
                 <p>No blog posts available yet. Be the first to share your travel story!</p>
-                {currentUser && (
-                    <button className="btn-primary" onClick={navigateToCreateBlog}>Write Your First Blog</button>
+                {effectiveUser && (
+                  <button className="btn-primary" onClick={navigateToCreateBlog}>Write Your First Blog</button>
                 )}
               </div>
             )}

@@ -31,8 +31,15 @@ public class BlogPostService {
     @Autowired
     private AdminFileStorageService adminFileStorageService; 
 
-    private BlogPostDTO convertToDTO(BlogPost blogPost) {
-        return BlogPostDTO.builder()
+    @Autowired
+    private BlogInteractionService blogInteractionService;
+
+   private BlogPostDTO convertToDTO(BlogPost blogPost) {
+        return convertToDTO(blogPost, null);
+    }
+
+    private BlogPostDTO convertToDTO(BlogPost blogPost, UUID currentUserId) {
+        BlogPostDTO dto = BlogPostDTO.builder()
                 .id(blogPost.getId())
                 .userId(blogPost.getUserId())
                 .title(blogPost.getTitle())
@@ -44,7 +51,15 @@ public class BlogPostService {
                 .updatedAt(blogPost.getUpdatedAt())
                 .username(blogPost.getUser() != null ? blogPost.getUser().getUsername() : null)
                 .userEmail(blogPost.getUser() != null ? blogPost.getUser().getEmail() : null)
+                .likeCount(blogInteractionService.getLikeCount(blogPost.getId()))
+                .commentCount(blogInteractionService.getCommentCount(blogPost.getId()))
                 .build();
+
+        if (currentUserId != null) {
+            dto.setIsLikedByCurrentUser(blogInteractionService.isLikedByUser(blogPost.getId(), currentUserId));
+        }
+
+        return dto;
     }
 
     @Transactional
@@ -74,15 +89,23 @@ public class BlogPostService {
     }
 
     public List<BlogPostDTO> getAllPublicBlogPosts() {
+        return getAllPublicBlogPosts(null);
+    }
+
+    public List<BlogPostDTO> getAllPublicBlogPosts(UUID currentUserId) {
         List<BlogPost> posts = blogPostRepository.findByIsPublicTrueOrderByCreatedAtDesc();
         return posts.stream()
-                .map(this::convertToDTO)
+                .map(post -> convertToDTO(post, currentUserId))
                 .collect(Collectors.toList());
     }
 
     public Optional<BlogPostDTO> getBlogPostById(UUID id) {
+        return getBlogPostById(id, null);
+    }
+
+    public Optional<BlogPostDTO> getBlogPostById(UUID id, UUID currentUserId) {
         return blogPostRepository.findById(id)
-                .map(this::convertToDTO);
+                .map(post -> convertToDTO(post, currentUserId));
     }
     
     public List<BlogPostDTO> getUserBlogPosts(UUID userId) {

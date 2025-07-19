@@ -26,4 +26,9 @@ public class BlogPostDTO {
     // Simplified user info
     private String username;
     private String userEmail;
+    
+    // Interaction counts
+    private Long likeCount;
+    private Long commentCount;
+    private Boolean isLikedByCurrentUser; // null if user not authenticated
 }
