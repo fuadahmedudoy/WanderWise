@@ -438,7 +438,7 @@ ALTER TABLE ONLY public.user_sessions
 -- Insert cities into travel_cities table
 INSERT INTO travel_cities (name, description) VALUES 
 ('Sylhet', 'A city in northeastern Bangladesh known for its tea gardens, hills, and Sufi shrines.'),
-('Rangamati', 'A scenic hill district in southeastern Bangladesh, famous for its lakes, tribal culture, and natural beauty.');
+
 
 -- Insert Sylhet spots
 INSERT INTO travel_spots (city_id, name, description, entry_fee, time_needed, best_time, lat, lon, image_url)
@@ -447,14 +447,6 @@ VALUES
 (1, 'Jaflong', 'Scenic area with hills, stones, and Dawki River near the border.', 100, 4, 'All Day', 25.1652, 92.0178, 'https://cdn.example.com/images/jaflong.jpg'),
 (1, 'Shahjalal Dargah', 'Famous Sufi shrine and pilgrimage site.', 0, 1, 'Evening', 24.8919, 91.8710, 'https://cdn.example.com/images/shahjalal_dargah.jpg'),
 (1, 'Lalakhal', 'Stunning blue-water river site with boat rides.', 150, 3, 'Morning', 25.1081, 92.0021, 'https://cdn.example.com/images/lalakhal.jpg');
-
--- Insert Rangamati spots
-INSERT INTO travel_spots (city_id, name, description, entry_fee, time_needed, best_time, lat, lon, image_url)
-VALUES 
-(2, 'Kaptai Lake', 'The largest man-made lake in Bangladesh, perfect for scenic boat rides and peaceful relaxation.', 50, 3, 'Morning and evening', 22.6500, 92.1833, 'https://cdn.example.com/images/kaptai_lake.jpg'),
-(2, 'Hanging Bridge', 'A 335-feet-long suspension bridge over the lake, iconic to Rangamati tourism.', 20, 1, 'Daytime', 22.6382, 92.1813, 'https://cdn.example.com/images/hanging_bridge.jpg'),
-(2, 'Sajek Valley', 'A breathtaking hill station known as the "Queen of Hills" in Bangladesh, famous for misty mountains, waterfalls, and tribal culture.', 0, 8, 'October to April (dry season)', 23.2026, 91.7637, 'https://cdn.example.com/images/sajek_valley.jpg'),
-(2, 'Rajban Vihara', 'A serene Buddhist monastery surrounded by hills, offering spiritual calm and beautiful architecture.', 0, 2, 'Morning or afternoon', 22.6145, 92.1848, 'https://cdn.example.com/images/rajban_vihara.jpg');
 
 -- Insert hotels for Sylhet spots
 INSERT INTO travel_hotels (spot_id, name, price_min, price_max, rating, lat, lon, contact, image_url) VALUES
@@ -471,20 +463,6 @@ INSERT INTO travel_hotels (spot_id, name, price_min, price_max, rating, lat, lon
 (4, 'Lalakhal Eco Resort', 2500, 4500, 4.3, 25.1075, 92.0015, '01722998844', 'https://cdn.example.com/images/lalakhal_resort.jpg'),
 (4, 'Nature Nest', 1800, 3000, 3.9, 25.1092, 92.0030, '01733445566', 'https://cdn.example.com/images/nature_nest.jpg');
 
--- Insert hotels for Rangamati spots
-INSERT INTO travel_hotels (spot_id, name, price_min, price_max, rating, lat, lon, contact, image_url) VALUES
--- Hotels for Kaptai Lake (spot_id = 5)
-(5, 'Parjatan Holiday Complex', 2000, 4000, 4.3, 22.6550, 92.1800, '01811223344', 'https://cdn.example.com/images/parjatan_rangamati.jpg'),
-(5, 'Lake View Resort', 1800, 3000, 4.0, 22.6525, 92.1840, '01899887766', 'https://cdn.example.com/images/lake_view_rangamati.jpg'),
--- Hotels for Hanging Bridge (spot_id = 6)
-(6, 'Bridge Side Lodge', 1500, 2500, 3.9, 22.6379, 92.1808, '01711223355', 'https://cdn.example.com/images/bridge_lodge.jpg'),
-(6, 'Rangamati Garden Inn', 2200, 3800, 4.2, 22.6390, 92.1825, '01733446688', 'https://cdn.example.com/images/garden_inn.jpg'),
--- Hotels for Sajek Valley (spot_id = 7)
-(7, 'Sajek Hill Resort', 2500, 4500, 4.1, 23.2035, 91.7642, '01722334455', 'https://cdn.example.com/images/sajek_resort.jpg'),
-(7, 'Hilltop Guest House', 1800, 3200, 3.9, 23.2010, 91.7630, '01799887744', 'https://cdn.example.com/images/hilltop_guest.jpg'),
--- Hotels for Rajban Vihara (spot_id = 8)
-(8, 'Vihara View Hotel', 1500, 2800, 4.0, 22.6150, 92.1852, '01755668899', 'https://cdn.example.com/images/vihara_view.jpg'),
-(8, 'Peaceful Stay Inn', 1300, 2500, 3.7, 22.6138, 92.1840, '01777889900', 'https://cdn.example.com/images/peaceful_stay.jpg');
 
 -- Insert restaurants for Sylhet spots
 INSERT INTO travel_restaurants (spot_id, name, popular_dishes, avg_cost, lat, lon, image_url) VALUES
@@ -500,18 +478,3 @@ INSERT INTO travel_restaurants (spot_id, name, popular_dishes, avg_cost, lat, lo
 -- Restaurants for Lalakhal (spot_id = 4)
 (4, 'River Breeze Dine', 'Fresh fish, Mustard curry, Rice', 270, 25.1080, 92.0017, 'https://cdn.example.com/images/river_breeze.jpg'),
 (4, 'Blue Water Eatery', 'Polao, Chicken roast', 240, 25.1078, 92.0022, 'https://cdn.example.com/images/blue_water.jpg');
-
--- Insert restaurants for Rangamati spots
-INSERT INTO travel_restaurants (spot_id, name, popular_dishes, avg_cost, lat, lon, image_url) VALUES
--- Restaurants for Kaptai Lake (spot_id = 5)
-(5, 'Lake Breeze Restaurant', 'Grilled fish, Bamboo chicken, Rice', 300, 22.6511, 92.1831, 'https://cdn.example.com/images/lake_breeze.jpg'),
-(5, 'Tribal Food Corner', 'Bamboo beef, Sticky rice, Local herbs', 250, 22.6505, 92.1845, 'https://cdn.example.com/images/tribal_food.jpg'),
--- Restaurants for Hanging Bridge (spot_id = 6)
-(6, 'Bridge View Café', 'Fish fry, Paratha, Coconut water', 200, 22.6384, 92.1811, 'https://cdn.example.com/images/bridge_cafe.jpg'),
-(6, 'Hillside Bites', 'Chicken curry, Lentils, Steamed rice', 180, 22.6395, 92.1828, 'https://cdn.example.com/images/hillside_bites.jpg'),
--- Restaurants for Sajek Valley (spot_id = 7)
-(7, 'Valley View Café', 'Local tribal dishes, Bamboo chicken, Herbal tea', 300, 23.2020, 91.7635, 'https://cdn.example.com/images/valley_cafe.jpg'),
-(7, 'Mountain Delight', 'Grilled fish, Rice, Vegetable curry', 250, 23.2030, 91.7640, 'https://cdn.example.com/images/mountain_delight.jpg'),
--- Restaurants for Rajban Vihara (spot_id = 8)
-(8, 'Monastery Café', 'Veggie curry, Rice, Tea', 180, 22.6147, 92.1847, 'https://cdn.example.com/images/monastery_cafe.jpg'),
-(8, 'Tranquil Bites', 'Local snacks, Herbal drinks', 150, 22.6155, 92.1850, 'https://cdn.example.com/images/tranquil_bites.jpg');

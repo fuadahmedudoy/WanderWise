@@ -1,14 +1,22 @@
 package com.example.demo.service;
 
+import com.example.demo.Repository.TripActivityRepository;
+import com.example.demo.entity.TripActivity;
 import com.example.demo.entity.TripPlan;
 import com.example.demo.entity.User;
 import com.example.demo.Repository.TripPlanRepository;
 import com.example.demo.Repository.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +32,8 @@ public class TripPlanService {
 
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private TripActivityRepository tripActivityRepository;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -223,9 +232,162 @@ public class TripPlanService {
     }
 
     /**
+     * Scheduled task to automatically update trip status based on dates
+     * Runs daily at midnight
+     * @return A map containing information about the update operation
+     */
+    @Scheduled(cron = "0 0 0 * * ?") // Run at midnight every day
+    @Transactional
+    public Map<String, Object> autoUpdateTripStatus() {
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        
+        System.out.println("\n" + "=".repeat(90));
+        System.out.println("🔄 AUTOMATED TRIP STATUS UPDATE - " + timestamp);
+        System.out.println("=".repeat(90));
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("timestamp", timestamp);
+        
+        try {
+            LocalDate today = LocalDate.now();
+            int updatedCount = 0;
+            int upcomingToRunning = 0;
+            int runningToCompleted = 0;
+            
+            // Get all upcoming trips
+            List<TripPlan> upcomingTrips = tripPlanRepository.findByStatus(TripPlan.TripStatus.UPCOMING);
+            System.out.println("📊 Found " + upcomingTrips.size() + " upcoming trips to check");
+            result.put("upcomingTripsChecked", upcomingTrips.size());
+            
+            for (TripPlan trip : upcomingTrips) {
+                LocalDate startDate = trip.getStartDate();
+                Integer durationDays = trip.getDurationDays();
+                
+                if (startDate != null && durationDays != null) {
+                    LocalDate endDate = startDate.plusDays(durationDays);
+                    
+                    // If start date is today or in the past, but end date is in the future
+                    if ((startDate.isEqual(today) || startDate.isBefore(today)) && endDate.isAfter(today)) {
+                        System.out.println("🔄 Updating trip #" + trip.getId() + " to RUNNING status");
+                        System.out.println("   📍 Destination: " + trip.getDestination());
+                        System.out.println("   📅 Start date: " + startDate + ", End date: " + endDate);
+                        
+                        trip.setStatus(TripPlan.TripStatus.RUNNING);
+                        tripPlanRepository.save(trip);
+                        updatedCount++;
+                        upcomingToRunning++;
+                    }
+                }
+            }
+            
+            // Get all running trips
+            List<TripPlan> runningTrips = tripPlanRepository.findByStatus(TripPlan.TripStatus.RUNNING);
+            System.out.println("📊 Found " + runningTrips.size() + " running trips to check");
+            result.put("runningTripsChecked", runningTrips.size());
+            
+            for (TripPlan trip : runningTrips) {
+                LocalDate startDate = trip.getStartDate();
+                Integer durationDays = trip.getDurationDays();
+                
+                if (startDate != null && durationDays != null) {
+                    LocalDate endDate = startDate.plusDays(durationDays);
+                    
+                    // If end date has passed
+                    if (endDate.isBefore(today)) {
+                        System.out.println("🔄 Updating trip #" + trip.getId() + " to COMPLETED status");
+                        System.out.println("   📍 Destination: " + trip.getDestination());
+                        System.out.println("   📅 Start date: " + startDate + ", End date: " + endDate);
+                        
+                        trip.setStatus(TripPlan.TripStatus.COMPLETED);
+                        tripPlanRepository.save(trip);
+                        updatedCount++;
+                        runningToCompleted++;
+                    }
+                }
+            }
+            
+            System.out.println("✅ Auto-update completed. Updated " + updatedCount + " trips.");
+            System.out.println("   - " + upcomingToRunning + " trips changed from UPCOMING to RUNNING");
+            System.out.println("   - " + runningToCompleted + " trips changed from RUNNING to COMPLETED");
+            System.out.println("=".repeat(90) + "\n");
+            
+            result.put("updatedCount", updatedCount);
+            result.put("upcomingToRunning", upcomingToRunning);
+            result.put("runningToCompleted", runningToCompleted);
+            result.put("success", true);
+            
+            return result;
+            
+        } catch (Exception e) {
+            System.err.println("❌ Error during auto trip status update: " + e.getMessage());
+            e.printStackTrace();
+            
+            result.put("success", false);
+            result.put("error", e.getMessage());
+            return result;
+        }
+    }
+    
+    /**
+     * Check if there are any trips that need status updates
+     * @return Map with information about trips that need updating
+     */
+    public Map<String, Object> checkTripsNeedingStatusUpdate() {
+        Map<String, Object> result = new HashMap<>();
+        LocalDate today = LocalDate.now();
+        
+        try {
+            // Check upcoming trips that should be running
+            List<TripPlan> upcomingTrips = tripPlanRepository.findByStatus(TripPlan.TripStatus.UPCOMING);
+            int upcomingNeedingUpdate = 0;
+            
+            for (TripPlan trip : upcomingTrips) {
+                LocalDate startDate = trip.getStartDate();
+                Integer durationDays = trip.getDurationDays();
+                
+                if (startDate != null && durationDays != null) {
+                    LocalDate endDate = startDate.plusDays(durationDays);
+                    
+                    if ((startDate.isEqual(today) || startDate.isBefore(today)) && endDate.isAfter(today)) {
+                        upcomingNeedingUpdate++;
+                    }
+                }
+            }
+            
+            // Check running trips that should be completed
+            List<TripPlan> runningTrips = tripPlanRepository.findByStatus(TripPlan.TripStatus.RUNNING);
+            int runningNeedingUpdate = 0;
+            
+            for (TripPlan trip : runningTrips) {
+                LocalDate startDate = trip.getStartDate();
+                Integer durationDays = trip.getDurationDays();
+                
+                if (startDate != null && durationDays != null) {
+                    LocalDate endDate = startDate.plusDays(durationDays);
+                    
+                    if (endDate.isBefore(today)) {
+                        runningNeedingUpdate++;
+                    }
+                }
+            }
+            
+            result.put("upcomingNeedingUpdate", upcomingNeedingUpdate);
+            result.put("runningNeedingUpdate", runningNeedingUpdate);
+            result.put("totalNeedingUpdate", upcomingNeedingUpdate + runningNeedingUpdate);
+            result.put("success", true);
+            
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("error", e.getMessage());
+        }
+        
+        return result;
+    }
+
+    /**
      * Delete a trip plan
      */
-    public void deleteTripPlan(Long tripId, String userIdentifier) {
+    public boolean deleteTripPlan(Long tripId, String userIdentifier) {
         try {
             Optional<User> userOptional = userRepository.findByUsername(userIdentifier);
             if (!userOptional.isPresent()) {
@@ -240,7 +402,7 @@ public class TripPlanService {
             
             Optional<TripPlan> tripOptional = tripPlanRepository.findById(tripId);
             if (!tripOptional.isPresent()) {
-                throw new RuntimeException("Trip plan not found with ID: " + tripId);
+                return false;
             }
 
             TripPlan tripPlan = tripOptional.get();
@@ -253,6 +415,7 @@ public class TripPlanService {
             tripPlanRepository.delete(tripPlan);
             
             System.out.println("✅ Trip plan deleted successfully: " + tripId);
+            return true;
 
         } catch (Exception e) {
             System.err.println("❌ Error deleting trip plan: " + e.getMessage());
@@ -285,5 +448,60 @@ public class TripPlanService {
         }
         
         return responses;
+    }
+
+
+    // ---------- Trip Activity CheckList -------------------
+    public Map<String, Boolean> getActivityByTripId(long id){
+        Optional<TripPlan> tripPlan=tripPlanRepository.findById(id);
+        String jsonString= tripPlan.get().getTripPlan();
+        System.out.println(jsonString);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = null;
+        try {
+            root = mapper.readTree(jsonString);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        List<String> activitySpots = new ArrayList<>();
+        Map<String,Boolean> activities=new HashMap<>();
+        JsonNode itinerary = root.path("daily_itinerary");
+        for (JsonNode day : itinerary) {
+            // Morning activity
+            JsonNode morning = day.path("morning_activity");
+            if (!morning.isMissingNode()) {
+                String s=morning.path("spot_name").asText();
+                TripActivity tripActivity=new TripActivity();
+                tripActivity.setTripId(id);
+                tripActivity.setActivity(s);
+                tripActivity.setCompleted(false);
+                tripActivityRepository.save(tripActivity);
+                activitySpots.add(s);
+                activities.put(s,false);
+            }
+
+            // Afternoon activities
+            JsonNode afternoon = day.path("afternoon_activities");
+            if (afternoon.isArray()) {
+                for (JsonNode activity : afternoon) {
+                    String s=activity.path("spot_name").asText();
+                    TripActivity tripActivity=new TripActivity();
+                    tripActivity.setTripId(id);
+                    tripActivity.setActivity(s);
+                    tripActivity.setCompleted(false);
+                    tripActivityRepository.save(tripActivity);
+
+                    activitySpots.add(s);
+                    activities.put(s,false);
+                }
+            }
+        }
+        return activities;
+    }
+    public void updateCheckList(Long tripId,String activity,boolean completed){
+        TripActivity tripActivity=tripActivityRepository.findByTripIdAndActivity(tripId,activity);
+        tripActivity.setCompleted(completed);
+        tripActivityRepository.save(tripActivity);
     }
 }

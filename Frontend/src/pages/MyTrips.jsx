@@ -169,6 +169,14 @@ const MyTrips = () => {
           >
             {isDeleting ? 'Deleting...' : 'Delete'}
           </button>
+          {trip.status === 'running' && (
+            <button 
+              className="btn-outline"
+              onClick={() => navigate(`/checklist/${trip.id}`)}
+            >
+              Checklist
+            </button>
+          )}
         </div>
       </div>
     );

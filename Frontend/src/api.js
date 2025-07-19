@@ -151,6 +151,28 @@ export const tripApi = {
         }
     },
 
+    // Trigger automatic status update (admin only)
+    triggerAutoStatusUpdate: async () => {
+        try {
+            const response = await api.post('/api/trip-plans/update-status-auto');
+            return response.data;
+        } catch (error) {
+            console.error('Error triggering automatic status update:', error);
+            throw error;
+        }
+    },
+    
+    // Check trips needing status updates (admin only)
+    checkTripsNeedingStatusUpdate: async () => {
+        try {
+            const response = await api.get('/api/trip-plans/check-status-updates');
+            return response.data;
+        } catch (error) {
+            console.error('Error checking trips needing status updates:', error);
+            throw error;
+        }
+    },
+
     // Get recent accepted trips
     getRecentAcceptedTrips: async () => {
         try {
@@ -180,6 +202,27 @@ export const tripApi = {
             return response.data;
         } catch (error) {
             console.error('Error deleting trip:', error);
+            throw error;
+        }
+    },
+    getCheckList: async(tripId) =>{
+        try{
+            const response=await api.get(`/api/checklist/${tripId}`);
+            return response.data;
+        }catch (error) {
+            console.error('Error fetching checklist:', error);
+            throw error;
+        }
+    },
+    updateChecklistItem: async(tripId, activity, completed) => {
+        try {
+            const response = await api.post(`/api/checklist/${tripId}/update`, {
+                activity: activity,
+                completed: completed
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error updating checklist item:', error);
             throw error;
         }
     }
@@ -245,6 +288,7 @@ export const adminApi = {
             throw error;
         }
     }
+    
 };
 
 // API Functions for Blog Posts

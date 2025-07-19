@@ -15,6 +15,7 @@ import WeatherDetails from './pages/WeatherDetails';
 import AdminDashboard from './pages/AdminDashboard';
 import CreateBlog from './pages/CreateBlog'; // NEW
 import BlogPostDetail from './pages/BlogPostDetail'; // NEW
+import CheckList from './pages/CheckList'; // Import CheckList
 import './styles/global.css';
 
 function App() {
@@ -80,6 +81,14 @@ function App() {
                 <AdminDashboard />
               </RequireAuth>
             } 
+          />
+          <Route
+            path="/checklist/:tripId"
+            element={
+              <RequireAuth>
+                <CheckList />
+              </RequireAuth>
+            }
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
