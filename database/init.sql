@@ -32,7 +32,7 @@ CREATE TABLE public.featured_destinations (
     reviews text[] DEFAULT '{}'::text[],
     is_active boolean DEFAULT true
 );
-
+--not used empty
 CREATE TABLE public.group_invitations (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
     group_trip_id uuid NOT NULL,
@@ -116,6 +116,8 @@ CREATE TABLE public.trip_todolist (
     date_added timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     date_visited timestamp with time zone
 );
+
+----upto this empty unused tables
 
 CREATE TABLE public.user_completed_trips (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
