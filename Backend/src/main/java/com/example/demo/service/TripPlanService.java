@@ -402,7 +402,7 @@ public class TripPlanService {
             
             Optional<TripPlan> tripOptional = tripPlanRepository.findById(tripId);
             if (!tripOptional.isPresent()) {
-                return false;
+                throw new RuntimeException("Trip plan not found with ID: " + tripId);
             }
 
             TripPlan tripPlan = tripOptional.get();
