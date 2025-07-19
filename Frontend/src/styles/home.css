@@ -371,3 +371,67 @@
     grid-template-columns: 1fr; /* Stack cards on small screens */
   }
 }
+
+
+/* Blog stats styling */
+.blog-stats {
+  display: flex;
+  gap: 1rem;
+  margin: 0.75rem 0;
+  padding: 0.5rem 0;
+  border-top: 1px solid #e1e8ed;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.stat-icon {
+  font-size: 1rem;
+}
+
+.stat-count {
+  font-weight: 500;
+}
+
+/* Blog card actions */
+.blog-card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.author-actions-small {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-btn-small {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  background: #4CAF50;
+  color: white;
+  border: 1px solid #4CAF50;
+}
+
+.edit-btn-small:hover {
+  background: #45a049;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .blog-card-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+  
+  .author-actions-small {
+    justify-content: center;
+  }
+}

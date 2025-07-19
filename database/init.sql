@@ -222,6 +222,26 @@ CREATE TABLE travel_restaurants (
     image_url TEXT
 );
 
+-- Table for blog post likes
+CREATE TABLE public.blog_likes (
+    id uuid DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
+    blog_post_id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(blog_post_id, user_id)
+);
+
+-- Table for blog post comments
+CREATE TABLE public.blog_comments (
+    id uuid DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
+    blog_post_id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    content text NOT NULL,
+    parent_comment_id uuid NULL, -- For nested/reply comments
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
 COPY public."FeaturedDestination_reviews" ("FeaturedDestination_id", reviews, "reviews_ORDER") FROM stdin;
 \.
 
@@ -480,3 +500,40 @@ INSERT INTO travel_restaurants (spot_id, name, popular_dishes, avg_cost, lat, lo
 -- Restaurants for Lalakhal (spot_id = 4)
 (4, 'River Breeze Dine', 'Fresh fish, Mustard curry, Rice', 270, 25.1080, 92.0017, 'https://cdn.example.com/images/river_breeze.jpg'),
 (4, 'Blue Water Eatery', 'Polao, Chicken roast', 240, 25.1078, 92.0022, 'https://cdn.example.com/images/blue_water.jpg');
+
+-- Insert restaurants for Rangamati spots
+INSERT INTO travel_restaurants (spot_id, name, popular_dishes, avg_cost, lat, lon, image_url) VALUES
+-- Restaurants for Kaptai Lake (spot_id = 5)
+(5, 'Lake Breeze Restaurant', 'Grilled fish, Bamboo chicken, Rice', 300, 22.6511, 92.1831, 'https://cdn.example.com/images/lake_breeze.jpg'),
+(5, 'Tribal Food Corner', 'Bamboo beef, Sticky rice, Local herbs', 250, 22.6505, 92.1845, 'https://cdn.example.com/images/tribal_food.jpg'),
+-- Restaurants for Hanging Bridge (spot_id = 6)
+(6, 'Bridge View Café', 'Fish fry, Paratha, Coconut water', 200, 22.6384, 92.1811, 'https://cdn.example.com/images/bridge_cafe.jpg'),
+(6, 'Hillside Bites', 'Chicken curry, Lentils, Steamed rice', 180, 22.6395, 92.1828, 'https://cdn.example.com/images/hillside_bites.jpg'),
+-- Restaurants for Sajek Valley (spot_id = 7)
+(7, 'Valley View Café', 'Local tribal dishes, Bamboo chicken, Herbal tea', 300, 23.2020, 91.7635, 'https://cdn.example.com/images/valley_cafe.jpg'),
+(7, 'Mountain Delight', 'Grilled fish, Rice, Vegetable curry', 250, 23.2030, 91.7640, 'https://cdn.example.com/images/mountain_delight.jpg'),
+-- Restaurants for Rajban Vihara (spot_id = 8)
+(8, 'Monastery Café', 'Veggie curry, Rice, Tea', 180, 22.6147, 92.1847, 'https://cdn.example.com/images/monastery_cafe.jpg'),
+(8, 'Tranquil Bites', 'Local snacks, Herbal drinks', 150, 22.6155, 92.1850, 'https://cdn.example.com/images/tranquil_bites.jpg');
+
+
+
+-- ADD THIS LINE:
+ALTER TABLE ONLY public.blog_posts
+    ADD CONSTRAINT blog_posts_pkey PRIMARY KEY (id);
+
+-- Add foreign key constraints
+ALTER TABLE ONLY public.blog_likes
+    ADD CONSTRAINT blog_likes_blog_post_id_fkey FOREIGN KEY (blog_post_id) REFERENCES public.blog_posts(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.blog_likes
+    ADD CONSTRAINT blog_likes_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.blog_comments
+    ADD CONSTRAINT blog_comments_blog_post_id_fkey FOREIGN KEY (blog_post_id) REFERENCES public.blog_posts(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.blog_comments
+    ADD CONSTRAINT blog_comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.blog_comments
+    ADD CONSTRAINT blog_comments_parent_comment_id_fkey FOREIGN KEY (parent_comment_id) REFERENCES public.blog_comments(id) ON DELETE CASCADE;

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { blogApi } from '../api';
 import AuthContext from '../context/AuthContext';
+import BlogInteractions from '../components/BlogInteractions';
 import '../styles/blog-post-detail.css'; 
 
 const BlogPostDetail = () => {
@@ -139,6 +140,7 @@ const BlogPostDetail = () => {
           <p>{blogPost.content}</p>
         </div>
       </div>
+      <BlogInteractions blogPost={blogPost} />
     </div>
   );
 };

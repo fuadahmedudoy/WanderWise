@@ -385,6 +385,67 @@ export const blogApi = {
             console.error('Error deleting blog post:', error);
             throw error;
         }
+    },
+    toggleLike: async (blogId) => {
+        try {
+            const response = await api.post(`/api/blogs/${blogId}/interactions/like`);
+            return response.data;
+        } catch (error) {
+            console.error('Error toggling like:', error);
+            throw error;
+        }
+    },
+
+    getBlogLikes: async (blogId) => {
+        try {
+            const response = await api.get(`/api/blogs/${blogId}/interactions/likes`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching likes:', error);
+            throw error;
+        }
+    },
+
+    
+    addComment: async (blogId, commentData) => {
+        try {
+            const response = await api.post(`/api/blogs/${blogId}/interactions/comments`, commentData);
+            return response.data;
+        } catch (error) {
+            console.error('Error adding comment:', error);
+            throw error;
+        }
+    },
+    getBlogComments: async (blogId) => {
+        try {
+            const response = await api.get(`/api/blogs/${blogId}/interactions/comments`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching comments:', error);
+            throw error;
+        }
+    },
+
+    updateComment: async (blogId, commentId, content) => {
+        try {
+            const response = await api.put(`/api/blogs/${blogId}/interactions/comments/${commentId}`, {
+                content: content
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error updating comment:', error);
+            throw error;
+        }
+    },
+
+    deleteComment: async (blogId, commentId) => {
+        try {
+            const response = await api.delete(`/api/blogs/${blogId}/interactions/comments/${commentId}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error deleting comment:', error);
+            throw error;
+        }
     }
 };
 
