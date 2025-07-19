@@ -74,7 +74,7 @@ public class DatabaseConnectionTest implements CommandLineRunner {
             System.out.println("   Driver Name: " + metaData.getDriverName());
         }
     }
-
+//
     private void checkTablesExist() throws Exception {
         System.out.println("\n📋 Checking if required tables exist...");
         
