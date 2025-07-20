@@ -16,6 +16,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import CreateBlog from './pages/CreateBlog'; 
 import BlogPostDetail from './pages/BlogPostDetail'; 
 import EditBlog from './pages/EditBlog';
+import GroupTrips from './pages/GroupTrips';
 import './styles/global.css';
 
 function App() {
@@ -63,6 +64,15 @@ function App() {
             element={
               <RequireAuth>
                 <MyTrips />
+              </RequireAuth>
+            } 
+          />
+          
+          <Route 
+            path="/group-trips" 
+            element={
+              <RequireAuth>
+                <GroupTrips />
               </RequireAuth>
             } 
           />

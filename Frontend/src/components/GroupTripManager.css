@@ -1,0 +1,809 @@
+.group-trip-manager {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.manager-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.manager-header h2 {
+    color: #1f2937;
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.manager-header p {
+    color: #6b7280;
+    font-size: 1.1rem;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: #6b7280;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e5e7eb;
+    border-top: 4px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.tabs-container {
+    display: flex;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 30px;
+    gap: 0;
+}
+
+.tab-button {
+    background: none;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.tab-button:hover {
+    color: #3b82f6;
+    background-color: #f8fafc;
+}
+
+.tab-button.active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+    font-weight: 600;
+}
+
+.error-message {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.error-message p {
+    color: #dc2626;
+    margin-bottom: 12px;
+}
+
+.retry-button {
+    background-color: #dc2626;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.retry-button:hover {
+    background-color: #b91c1c;
+}
+
+.trips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.no-trips-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+}
+
+.no-trips-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+}
+
+.no-trips-message h3 {
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.trip-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.trip-card:hover {
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.trip-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.trip-card-header h3 {
+    color: #1f2937;
+    font-size: 1.25rem;
+    margin: 0;
+    flex: 1;
+    margin-right: 12px;
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-open {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-full {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-closed {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.status-completed {
+    background-color: #e0e7ff;
+    color: #3730a3;
+}
+
+.status-default {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.trip-basic-info {
+    margin-bottom: 16px;
+}
+
+.trip-description {
+    color: #4b5563;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.trip-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.trip-meta span {
+    color: #6b7280;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.meeting-point {
+    background-color: #f8fafc;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    font-size: 0.875rem;
+    color: #4b5563;
+}
+
+.trip-dates {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.trip-card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.view-details-btn {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.view-details-btn:hover {
+    background-color: #2563eb;
+}
+
+.creator-badge {
+    background-color: #fbbf24;
+    color: #92400e;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Trip Details Modal */
+.trip-details-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.trip-details-content {
+    background: white;
+    border-radius: 12px;
+    max-width: 800px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 24px 0 24px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 20px;
+}
+
+.details-header h2 {
+    color: #1f2937;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.close-details-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.2s ease;
+}
+
+.close-details-btn:hover {
+    color: #374151;
+    background-color: #f3f4f6;
+}
+
+.details-body {
+    padding: 0 24px 24px 24px;
+}
+
+.trip-overview h3 {
+    color: #1f2937;
+    margin-bottom: 16px;
+    font-size: 1.25rem;
+}
+
+.overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.overview-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.overview-item strong {
+    color: #374151;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.overview-item span {
+    color: #6b7280;
+}
+
+.description-section, .requirements-section {
+    margin-bottom: 20px;
+}
+
+.description-section strong, .requirements-section strong {
+    color: #374151;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.description-section p, .requirements-section p {
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+.members-section {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 20px;
+}
+
+.members-section h3 {
+    color: #1f2937;
+    margin-bottom: 16px;
+    font-size: 1.25rem;
+}
+
+.members-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.member-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.member-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.member-name {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.member-email {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.member-status {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: fit-content;
+}
+
+.member-accepted {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.member-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.member-requested {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.member-declined {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.member-default {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.member-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.approve-btn, .decline-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.approve-btn {
+    background-color: #10b981;
+    color: white;
+}
+
+.approve-btn:hover {
+    background-color: #059669;
+}
+
+.decline-btn {
+    background-color: #ef4444;
+    color: white;
+}
+
+.decline-btn:hover {
+    background-color: #dc2626;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .group-trip-manager {
+        padding: 16px;
+    }
+    
+    .trips-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .tabs-container {
+        flex-direction: column;
+    }
+    
+    .tab-button {
+        border-bottom: none;
+        border-left: 3px solid transparent;
+        text-align: left;
+    }
+    
+    .tab-button.active {
+        border-left-color: #3b82f6;
+        border-bottom-color: transparent;
+    }
+    
+    .trip-card {
+        padding: 16px;
+    }
+    
+    .overview-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .member-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .member-actions {
+        align-self: stretch;
+        justify-content: flex-end;
+    }
+}
+
+/* Trip Preview Styles */
+.trip-preview {
+    margin-top: 16px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.preview-header {
+    margin-bottom: 12px;
+}
+
+.preview-header strong {
+    color: #1f2937;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.preview-activities {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.preview-day {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: white;
+    border-radius: 8px;
+    border-left: 3px solid #3b82f6;
+}
+
+.preview-day-label {
+    font-weight: 600;
+    color: #1e40af;
+    font-size: 0.9rem;
+    min-width: 50px;
+}
+
+.preview-activity {
+    color: #4b5563;
+    font-size: 0.9rem;
+    flex: 1;
+}
+
+.preview-more {
+    color: #6b7280;
+    font-style: italic;
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 4px;
+    background: #e5e7eb;
+    border-radius: 6px;
+}
+
+.trip-budget {
+    color: #059669;
+    font-weight: 600;
+    background: #d1fae5;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+/* Responsive Design for Preview */
+@media (max-width: 768px) {
+    .trip-preview {
+        padding: 12px;
+    }
+    
+    .preview-day {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .preview-day-label {
+        min-width: auto;
+        font-size: 0.8rem;
+    }
+    
+    .preview-activity {
+        font-size: 0.8rem;
+    }
+}
+
+/* Message Modal Styles */
+.message-section {
+    padding: 20px 0;
+}
+
+.message-section h3 {
+    color: #1f2937;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.my-message-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.message-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.message-text {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 4px solid #3b82f6;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #374151;
+    margin: 0;
+    font-style: italic;
+}
+
+.message-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.request-date {
+    margin: 0;
+}
+
+.message-status {
+    margin: 0;
+}
+
+.status-requested {
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+.status-accepted {
+    color: #10b981;
+    font-weight: 600;
+}
+
+.status-declined {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.no-message {
+    text-align: center;
+    color: #9ca3af;
+    font-style: italic;
+    padding: 40px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px dashed #d1d5db;
+}
+
+/* Button styles for info button */
+.btn-info {
+    background-color: #06b6d4;
+    color: white;
+    border: 1px solid #0891b2;
+}
+
+.btn-info:hover {
+    background-color: #0891b2;
+    border-color: #0e7490;
+}
+
+.btn-info:disabled {
+    background-color: #a1a1aa;
+    border-color: #a1a1aa;
+    cursor: not-allowed;
+}
+
+/* Chat Access Info Styles */
+.chat-access-info {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.member-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.member-count {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.95rem;
+}
+
+.access-status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.access-status.has-access {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.access-status.no-access {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.access-notice {
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 12px;
+}
+
+.access-notice p {
+    margin: 0;
+    color: #92400e;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.no-messages {
+    text-align: center;
+    color: #6b7280;
+    font-style: italic;
+    padding: 40px 20px;
+    background: #f9fafb;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.chat-disabled-notice {
+    text-align: center;
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 20px;
+    color: #374151;
+}
+
+.chat-disabled-notice p {
+    margin: 0 0 8px 0;
+    font-weight: 500;
+}
+
+.chat-disabled-notice p:last-child {
+    margin-bottom: 0;
+    color: #6b7280;
+    font-weight: normal;
+}

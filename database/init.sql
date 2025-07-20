@@ -57,14 +57,18 @@ CREATE TABLE public.group_trip_members (
 
 CREATE TABLE public.group_trips (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
-    trip_plan_id uuid NOT NULL,
+    trip_plan_id integer NOT NULL,
     created_by_user_id uuid NOT NULL,
     group_name character varying(255) NOT NULL,
     description text,
-    status character varying(20) DEFAULT 'ACTIVE'::character varying NOT NULL,
+    max_people integer,
+    meeting_point character varying(500),
+    additional_requirements text,
+    current_members integer DEFAULT 1,
+    status character varying(20) DEFAULT 'OPEN'::character varying NOT NULL,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT group_trips_status_check CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'CANCELLED'::character varying, 'COMPLETED'::character varying])::text[])))
+    CONSTRAINT group_trips_status_check CHECK (((status)::text = ANY ((ARRAY['OPEN'::character varying, 'FULL'::character varying, 'CLOSED'::character varying, 'COMPLETED'::character varying])::text[])))
 );
 
 CREATE TABLE public.password_reset_tokens (
@@ -75,12 +79,6 @@ CREATE TABLE public.password_reset_tokens (
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     used boolean DEFAULT false
 );
-
-
-
-
-
-
 
 CREATE TABLE public.trip_requests (
     id uuid DEFAULT gen_random_uuid() NOT NULL,
@@ -384,7 +382,7 @@ ALTER TABLE ONLY public.group_trips
     ADD CONSTRAINT group_trips_created_by_user_id_fkey FOREIGN KEY (created_by_user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.group_trips
-    ADD CONSTRAINT group_trips_trip_plan_id_fkey FOREIGN KEY (trip_plan_id) REFERENCES public.trip_plans(id) ON DELETE CASCADE;
+    ADD CONSTRAINT group_trips_trip_plan_id_fkey FOREIGN KEY (trip_plan_id) REFERENCES public.trip_plan(id) ON DELETE CASCADE;
 
 ALTER TABLE ONLY public.password_reset_tokens
     ADD CONSTRAINT password_reset_tokens_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
@@ -515,3 +513,54 @@ INSERT INTO travel_restaurants (spot_id, name, popular_dishes, avg_cost, lat, lo
 -- Restaurants for Rajban Vihara (spot_id = 8)
 (8, 'Monastery Café', 'Veggie curry, Rice, Tea', 180, 22.6147, 92.1847, 'https://cdn.example.com/images/monastery_cafe.jpg'),
 (8, 'Tranquil Bites', 'Local snacks, Herbal drinks', 150, 22.6155, 92.1850, 'https://cdn.example.com/images/tranquil_bites.jpg');
+
+
+
+-- Archived migration scripts for reference
+
+-- fix_group_trips_schema.sql
+-- --------------------------
+-- Migration script to fix group_trips table schema
+-- Run this if your database doesn't match the current init.sql
+
+ALTER TABLE public.group_trips DROP CONSTRAINT IF EXISTS group_trips_trip_plan_id_fkey;
+DROP TABLE IF EXISTS public.group_trips CASCADE;
+CREATE TABLE public.group_trips (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    trip_plan_id integer NOT NULL,
+    created_by_user_id uuid NOT NULL,
+    group_name character varying(255) NOT NULL,
+    description text,
+    max_people integer,
+    meeting_point character varying(500),
+    additional_requirements text,
+    current_members integer DEFAULT 1,
+    status character varying(20) DEFAULT 'OPEN'::character varying NOT NULL,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT group_trips_status_check CHECK (((status)::text = ANY ((ARRAY['OPEN'::character varying, 'FULL'::character varying, 'CLOSED'::character varying, 'COMPLETED'::character varying])::text[])))
+);
+ALTER TABLE ONLY public.group_trips ADD CONSTRAINT group_trips_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.group_trips ADD CONSTRAINT group_trips_created_by_user_id_fkey FOREIGN KEY (created_by_user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+ALTER TABLE ONLY public.group_trips ADD CONSTRAINT group_trips_trip_plan_id_fkey FOREIGN KEY (trip_plan_id) REFERENCES public.trip_plan(id) ON DELETE CASCADE;
+
+
+-- migrate_group_trips.sql
+-- ----------------------
+-- Migration to fix group_trips table schema
+-- Run this script to add missing columns to your existing database
+
+ALTER TABLE public.group_trips 
+ADD COLUMN IF NOT EXISTS max_people integer,
+ADD COLUMN IF NOT EXISTS meeting_point character varying(500),
+ADD COLUMN IF NOT EXISTS additional_requirements text,
+ADD COLUMN IF NOT EXISTS current_members integer DEFAULT 1;
+UPDATE public.group_trips SET current_members = 1 WHERE current_members IS NULL;
+ALTER TABLE public.group_trips DROP CONSTRAINT IF EXISTS group_trips_status_check;
+ALTER TABLE public.group_trips ADD CONSTRAINT group_trips_status_check 
+CHECK (((status)::text = ANY ((ARRAY['OPEN'::character varying, 'FULL'::character varying, 'CLOSED'::character varying, 'COMPLETED'::character varying])::text[])));
+UPDATE public.group_trips SET status = 'OPEN' WHERE status = 'ACTIVE';
+UPDATE public.group_trips SET status = 'COMPLETED' WHERE status = 'CANCELLED';
+UPDATE public.group_trips SET status = 'OPEN' WHERE status IS NULL;
+ALTER TABLE public.group_trips ALTER COLUMN status SET DEFAULT 'OPEN'::character varying;
+COMMIT;

@@ -104,6 +104,7 @@ const Home = () => {
             )}
             <button onClick={navigateToCreateBlog} className="btn-outline">Write Blog</button>
             <button onClick={() => navigate('/my-trips')} className="btn-outline nav-btn">My Trips</button>
+            <button onClick={() => navigate('/group-trips')} className="btn-outline nav-btn">Group Trips</button>
             <button onClick={() => navigate('/profile')} className="btn-outline">Profile</button>
             <button onClick={handleLogout} className="btn-outline">Logout</button>
           </div>
@@ -124,6 +125,7 @@ const Home = () => {
         <div className="action-buttons">
           <button className="btn-primary" onClick={navigateToCreateTrip}>Create New Trip</button>
           <button className="btn-secondary" onClick={navigateToMyTrips}>View My Trips</button>
+          <button className="btn-secondary" onClick={() => navigate('/group-trips')}>Browse Group Trips</button>
         </div>
       </div>
       

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import { tripApi } from '../api'; // <-- Import tripApi
 import TripDetailsModal from '../components/TripDetailsModal';
+import GroupTripRequestModal from '../components/GroupTripRequestModal';
 import NotificationCenter from '../components/NotificationCenter';
 import '../styles/trips.css';
 
@@ -21,6 +22,8 @@ const MyTrips = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [activeTab, setActiveTab] = useState('running');
+  const [showGroupTripModal, setShowGroupTripModal] = useState(false);
+  const [selectedTripForGroup, setSelectedTripForGroup] = useState(null);
   
   useEffect(() => {
     const fetchTrips = async () => {
@@ -122,6 +125,39 @@ const MyTrips = () => {
     }
   };
 
+  // Handle group trip request
+  const handleRequestGroupTrip = (trip) => {
+    setSelectedTripForGroup(trip);
+    setShowGroupTripModal(true);
+  };
+
+  // Handle group trip creation
+  const handleCreateGroupTrip = async (groupTripData) => {
+    try {
+      console.log('Creating group trip with data:', groupTripData);
+      console.log('Stringified data:', JSON.stringify(groupTripData, null, 2));
+      
+      // Make API call to create group trip (using simple API for testing)
+      const response = await tripApi.createGroupTripSimple(groupTripData);
+      
+      console.log('API Response:', response);
+      
+      if (response.success) {
+        alert('🎉 Group trip created successfully! Other users can now see and join your trip.');
+      } else {
+        throw new Error(response.error || 'Failed to create group trip');
+      }
+    } catch (error) {
+      console.error('Error creating group trip:', error);
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      throw error; // Re-throw to be handled by the modal
+    }
+  };
+
   const handleLogin = () => {
     navigate('/auth/login');
   };
@@ -161,6 +197,14 @@ const MyTrips = () => {
             disabled={isDeleting}
           >
             View Details
+          </button>
+          <button 
+            className="btn-group-trip"
+            onClick={() => handleRequestGroupTrip(trip)}
+            disabled={isDeleting}
+            title="Create a group trip for others to join"
+          >
+            Request Group Trip
           </button>
           <button 
             className="btn-danger"
@@ -304,6 +348,14 @@ const MyTrips = () => {
         trip={selectedTrip} 
         isOpen={isModalOpen}
         onClose={handleCloseModal} 
+      />
+
+      {/* Group Trip Request Modal */}
+      <GroupTripRequestModal
+        isOpen={showGroupTripModal}
+        onClose={() => setShowGroupTripModal(false)}
+        tripPlan={selectedTripForGroup?.tripPlan}
+        onSubmit={handleCreateGroupTrip}
       />
     </div>
   );

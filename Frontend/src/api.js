@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create a dedicated Axios instance
 const api = axios.create({
-    
+    timeout: 30000, // 30 seconds timeout for group trip operations
 });
 
 // ---- Request Interceptor ----
@@ -182,6 +182,98 @@ export const tripApi = {
             console.error('Error deleting trip:', error);
             throw error;
         }
+    },
+
+    // Create a group trip
+    createGroupTrip: async (groupTripData) => {
+        try {
+            const response = await api.post('/api/group-trips/create', groupTripData);
+            return response.data;
+        } catch (error) {
+            console.error('Error creating group trip:', error);
+            throw error;
+        }
+    },
+
+    // Test simple group trip creation
+    createGroupTripSimple: async (groupTripData) => {
+        try {
+            const response = await api.post('/api/group-trips-simple/create', groupTripData);
+            return response.data;
+        } catch (error) {
+            console.error('Error creating simple group trip:', error);
+            throw error;
+        }
+    },
+
+    // Get available group trips
+    getAvailableGroupTrips: async () => {
+        try {
+            console.log('🔍 Fetching available group trips...');
+            const response = await api.get('/api/group-trips/available');
+            console.log('✅ Available group trips response:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('❌ Error fetching available group trips:', error);
+            console.error('Response data:', error.response?.data);
+            throw error;
+        }
+    },
+
+    // Get user's own group trips
+    getMyGroupTrips: async () => {
+        try {
+            console.log('📋 Fetching my group trips...');
+            const response = await api.get('/api/group-trips/my-trips');
+            console.log('✅ My group trips response:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('❌ Error fetching my group trips:', error);
+            console.error('Response data:', error.response?.data);
+            throw error;
+        }
+    },
+
+    // Join a group trip
+    joinGroupTrip: async (groupTripId, joinData) => {
+        try {
+            console.log('🤝 Joining group trip:', groupTripId, joinData);
+            const response = await api.post(`/api/group-trips/${groupTripId}/join`, joinData);
+            console.log('✅ Join group trip response:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('❌ Error joining group trip:', error);
+            console.error('Response data:', error.response?.data);
+            throw error;
+        }
+    },
+
+    // Get group trip details
+    getGroupTripDetails: async (groupTripId) => {
+        try {
+            console.log('📖 Fetching group trip details for:', groupTripId);
+            const response = await api.get(`/api/group-trips/${groupTripId}`);
+            console.log('✅ Group trip details response:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('❌ Error fetching group trip details:', error);
+            console.error('Response data:', error.response?.data);
+            throw error;
+        }
+    },
+
+    // Respond to join request (approve/reject)
+    respondToJoinRequest: async (groupTripId, memberId, approve) => {
+        try {
+            console.log('📝 Responding to join request:', { groupTripId, memberId, approve });
+            const response = await api.post(`/api/group-trips/${groupTripId}/members/${memberId}/respond?approve=${approve}`);
+            console.log('✅ Respond to join request response:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('❌ Error responding to join request:', error);
+            console.error('Response data:', error.response?.data);
+            throw error;
+        }
     }
 };
 
@@ -339,6 +431,65 @@ export const blogApi = {
             return response.data;
         } catch (error) {
             console.error('Error deleting blog post:', error);
+            throw error;
+        }
+    },
+
+    // Group Chat Methods
+    getGroupChatMessages: async (groupTripId) => {
+        try {
+            console.log('API: Loading chat messages for trip ID:', groupTripId);
+            const response = await api.get(`/api/group-trips/${groupTripId}/chat`);
+            console.log('API: Chat messages response:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('API: Error fetching chat messages:', error);
+            console.error('API: Error details:', error.response?.data);
+            console.error('API: Error status:', error.response?.status);
+            
+            // Return an error response instead of throwing
+            return {
+                success: false,
+                error: error.response?.data?.error || error.message || 'Failed to load chat messages'
+            };
+        }
+    },
+
+    sendGroupChatMessage: async (groupTripId, message) => {
+        try {
+            console.log('API: Sending group chat message to trip ID:', groupTripId);
+            console.log('API: Message content:', message);
+            console.log('API: Request URL:', `/api/group-trips/${groupTripId}/chat`);
+            
+            const requestData = { message: message };
+            console.log('API: Request data:', requestData);
+            
+            const response = await api.post(`/api/group-trips/${groupTripId}/chat`, requestData);
+            
+            console.log('API: Group chat message response status:', response.status);
+            console.log('API: Group chat message response data:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('API: Error sending chat message:', error);
+            console.error('API: Error details:', error.response?.data);
+            console.error('API: Error status:', error.response?.status);
+            console.error('API: Error message:', error.message);
+            
+            // Return an error response instead of throwing
+            return {
+                success: false,
+                error: error.response?.data?.error || error.response?.data?.message || error.message || 'Failed to send message'
+            };
+        }
+    },
+
+    // Get group trip members (for trip creator to manage approval requests)
+    getGroupTripMembers: async (groupTripId) => {
+        try {
+            const response = await api.get(`/api/group-trips/${groupTripId}/members`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching group members:', error);
             throw error;
         }
     }
