@@ -459,6 +459,65 @@ export const blogApi = {
         try {
             console.log('API: Sending group chat message to trip ID:', groupTripId);
             console.log('API: Message content:', message);
+            console.log('API: Request URL:', `/api/group-trips/${groupTripId}/chat`);
+            
+            const requestData = { message: message };
+            console.log('API: Request data:', requestData);
+            
+            const response = await api.post(`/api/group-trips/${groupTripId}/chat`, requestData);
+            
+            console.log('API: Group chat message response status:', response.status);
+            console.log('API: Group chat message response data:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('API: Error sending chat message:', error);
+            console.error('API: Error details:', error.response?.data);
+            console.error('API: Error status:', error.response?.status);
+            console.error('API: Error message:', error.message);
+            
+            // Return an error response instead of throwing
+            return {
+                success: false,
+                error: error.response?.data?.error || error.response?.data?.message || error.message || 'Failed to send message'
+            };
+        }
+    },
+
+    // Get group trip members (for trip creator to manage approval requests)
+    getGroupTripMembers: async (groupTripId) => {
+        try {
+            const response = await api.get(`/api/group-trips/${groupTripId}/members`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching group members:', error);
+            throw error;
+        }
+    },
+
+    // Group Chat Methods
+    getGroupChatMessages: async (groupTripId) => {
+        try {
+            console.log('API: Loading chat messages for trip ID:', groupTripId);
+            const response = await api.get(`/api/group-trips/${groupTripId}/chat`);
+            console.log('API: Chat messages response:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('API: Error fetching chat messages:', error);
+            console.error('API: Error details:', error.response?.data);
+            console.error('API: Error status:', error.response?.status);
+            
+            // Return an error response instead of throwing
+            return {
+                success: false,
+                error: error.response?.data?.error || error.message || 'Failed to load chat messages'
+            };
+        }
+    },
+
+    sendGroupChatMessage: async (groupTripId, message) => {
+        try {
+            console.log('API: Sending group chat message to trip ID:', groupTripId);
+            console.log('API: Message content:', message);
             
             const response = await api.post(`/api/group-trips/${groupTripId}/chat`, {
                 message: message

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { tripApi } from '../api';
 import api from '../api';
+import GroupTripRequestModal from '../components/GroupTripRequestModal';
 import '../styles/travel-planner.css';
 
 const TravelPlanner = () => {
-    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         destination: '',
         start_date: '',
@@ -17,6 +16,7 @@ const TravelPlanner = () => {
     const [planData, setPlanData] = useState(null);
     const [error, setError] = useState('');
     const [isAcceptingTrip, setIsAcceptingTrip] = useState(false);
+    const [showGroupTripModal, setShowGroupTripModal] = useState(false);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -108,6 +108,25 @@ const TravelPlanner = () => {
             alert('❌ Failed to accept trip. Please try again.');
         } finally {
             setIsAcceptingTrip(false);
+        }
+    };
+
+    // Handle group trip creation
+    const handleCreateGroupTrip = async (groupTripData) => {
+        try {
+            console.log('Creating group trip with data:', groupTripData);
+            
+            // Make API call to create group trip
+            const response = await api.post('/api/group-trips/create', groupTripData);
+            
+            if (response.data.success) {
+                alert('🎉 Group trip created successfully! Other users can now see and join your trip.');
+            } else {
+                throw new Error(response.data.error || 'Failed to create group trip');
+            }
+        } catch (error) {
+            console.error('Error creating group trip:', error);
+            throw error; // Re-throw to be handled by the modal
         }
     };
 
@@ -696,6 +715,16 @@ const TravelPlanner = () => {
                                 title={planData ? "Accept and save this trip plan" : "No plan available to accept"}
                             >
                                 {isAcceptingTrip ? '⏳ Accepting...' : '✅ Accept This Trip'}
+                            </button>
+
+                            <button 
+                                type="button"
+                                className="group-trip-btn"
+                                onClick={() => setShowGroupTripModal(true)}
+                                disabled={!planData}
+                                title={planData ? "Create a group trip for others to join" : "No plan available for group trip"}
+                            >
+                                👥 Request Group Trip
                             </button>                            <button 
                                 className="export-btn"
                                 onClick={handleExport}
@@ -727,6 +756,14 @@ const TravelPlanner = () => {
                     </div>
                 )}
             </div>
+
+            {/* Group Trip Request Modal */}
+            <GroupTripRequestModal
+                isOpen={showGroupTripModal}
+                onClose={() => setShowGroupTripModal(false)}
+                tripPlan={planData}
+                onSubmit={handleCreateGroupTrip}
+            />
         </div>
     );
 };

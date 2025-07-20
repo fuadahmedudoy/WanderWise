@@ -29,6 +29,7 @@ const Navbar = () => {
         <div className="action-buttons">
           <button onClick={() => navigate('/create-blog')} className="btn-outline">Write Blog</button> {/* NEW */}
           <button onClick={() => navigate('/my-trips')} className="btn-outline nav-btn">My Trips</button>
+          <button onClick={() => navigate('/group-trips')} className="btn-outline nav-btn">Group Trips</button>
           <NotificationCenter />
           {effectiveUser.role === 'ADMIN' && (
             <button onClick={() => navigate('/admin')} className="btn-outline admin-btn">Admin Dashboard</button>

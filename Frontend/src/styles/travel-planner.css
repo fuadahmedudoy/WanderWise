@@ -566,7 +566,8 @@
 .accept-trip-btn,
 .save-trip-btn,
 .export-btn,
-.share-btn {
+.share-btn,
+.group-trip-btn {
     padding: 12px 24px;
     border: none;
     border-radius: 8px;
@@ -625,6 +626,22 @@
 
 .share-btn:hover {
     transform: translateY(-1px);    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.group-trip-btn {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+}
+
+.group-trip-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.group-trip-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 /* Enhanced LLM Trip Plan Styles */

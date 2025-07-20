@@ -9,6 +9,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
 public class UserService {
     @Autowired
@@ -59,5 +62,19 @@ public class UserService {
     
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
+    }
+
+    public UUID getUserIdByEmailOrUsername(String userIdentifier) {
+        // Find user by username first, then by email if not found
+        Optional<User> userOptional = userRepository.findByUsername(userIdentifier);
+        if (!userOptional.isPresent()) {
+            userOptional = userRepository.findByEmail(userIdentifier);
+        }
+        
+        if (!userOptional.isPresent()) {
+            throw new RuntimeException("User not found with identifier: " + userIdentifier);
+        }
+
+        return userOptional.get().getId();
     }
 }
