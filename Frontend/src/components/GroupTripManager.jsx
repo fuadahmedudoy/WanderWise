@@ -955,6 +955,14 @@ const GroupTripManager = () => {
                             >
                                 ×
                             </button>
+                            <button
+                                className="refresh-chat-btn"
+                                style={{ marginLeft: '10px', padding: '4px 10px', fontSize: '14px', cursor: 'pointer' }}
+                                onClick={loadGroupChat}
+                                disabled={chatLoading}
+                            >
+                                🔄 Refresh
+                            </button>
                         </div>
                         <div className="modal-body chat-body">
                             {/* Chat Access Info */}

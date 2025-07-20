@@ -274,7 +274,43 @@ export const tripApi = {
             console.error('Response data:', error.response?.data);
             throw error;
         }
-    }
+    },
+    // ...existing code...
+    getGroupChatMessages: async (groupTripId) => {
+        try {
+            console.log('API: Loading chat messages for trip ID:', groupTripId);
+            const response = await api.get(`/api/group-trips/${groupTripId}/chat`);
+            console.log('API: Chat messages response:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('API: Error fetching chat messages:', error);
+            console.error('API: Error details:', error.response?.data);
+            console.error('API: Error status:', error.response?.status);
+            return {
+                success: false,
+                error: error.response?.data?.error || error.message || 'Failed to load chat messages'
+            };
+        }
+    },
+    sendGroupChatMessage: async (groupTripId, message) => {
+        try {
+            console.log('API: Sending group chat message to trip ID:', groupTripId);
+            console.log('API: Message content:', message);
+            const requestData = { message: message };
+            const response = await api.post(`/api/group-trips/${groupTripId}/chat`, requestData);
+            console.log('API: Group chat message response status:', response.status);
+            console.log('API: Group chat message response data:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('API: Error sending chat message:', error);
+            console.error('API: Error details:', error.response?.data);
+            console.error('API: Error status:', error.response?.status);
+            return {
+                success: false,
+                error: error.response?.data?.error || error.response?.data?.message || error.message || 'Failed to send message'
+            };
+        }
+    },
 };
 
 // API Functions for Admin Features
