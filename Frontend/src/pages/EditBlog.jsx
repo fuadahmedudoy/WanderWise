@@ -4,6 +4,8 @@ import AuthContext from '../context/AuthContext';
 import { blogApi } from '../api';
 import '../styles/create-blog.css'; // Reuse the same styles
 
+//
+
 const EditBlog = () => {
   const { id } = useParams();
   const { currentUser } = useContext(AuthContext);
