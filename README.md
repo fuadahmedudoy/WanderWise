@@ -9,8 +9,6 @@ Tech stack: Spring Boot, Flask, React, PostgreSQL, OpenAI API.
 - Integrated weather data (WeatherAPI) with travel planning logic.  
 - Did all the backend and frontend tests with ci/cd integration
 
-[![Tests](https://github.com/YOUR_USERNAME/YOUR_REPO_NAME/actions/workflows/test.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO_NAME/actions/workflows/test.yml)
-[![Deploy](https://github.com/YOUR_USERNAME/YOUR_REPO_NAME/actions/workflows/deploy.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPO_NAME/actions/workflows/deploy.yml)
 
 A comprehensive travel planning application built with React frontend and Java Spring Boot backend.
 
@@ -107,3 +105,4 @@ Deployment is automated through GitHub Actions:
 
 
 *Ensure all tests pass before merging to main branch to maintain deployment pipeline integrity.*
+
